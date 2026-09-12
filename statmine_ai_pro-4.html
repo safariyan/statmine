@@ -1,0 +1,689 @@
+<!doctype html><html lang="fa" dir="rtl"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="theme-color" content="#16233A">
+<title>StatMine AI Pro</title>
+<link rel="manifest" href="manifest.json">
+<link rel="icon" href="icon-192.png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<script src="https://cdn.jsdelivr.net/npm/papaparse@5.4.1/papaparse.min.js"></script><script src="https://cdn.plot.ly/plotly-2.35.2.min.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Vazirmatn:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{--ink:#16233A;--ink-2:#20334F;--paper:#F6F3EA;--card:#FFFFFF;--line:#E3DDCB;--accent:#B9822E;--accent-ink:#5C3E13;--danger:#96382F;--text:#1C2430;--text-soft:#616B7A}
+*{box-sizing:border-box}
+html,body{margin:0}
+body{font-family:'Vazirmatn',Tahoma,Arial,sans-serif;background:var(--paper);color:var(--text);-webkit-font-smoothing:antialiased}
+header{background:linear-gradient(155deg,var(--ink),var(--ink-2));color:#fff;padding:20px 5%;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:14px;border-bottom:3px solid var(--accent)}
+header b{font-weight:800;letter-spacing:.2px}
+main{max-width:1200px;margin:auto;padding:26px 20px 40px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:22px;margin-bottom:18px;box-shadow:0 1px 2px rgba(20,20,10,.04)}
+h3{margin:0 0 14px;font-size:16.5px;font-weight:700;color:var(--ink)}
+.tabs{display:flex;gap:4px;flex-wrap:wrap;margin-bottom:24px;border-bottom:1px solid var(--line)}
+.tabs button{background:transparent;color:var(--text-soft);border:0;border-bottom:2px solid transparent;padding:11px 13px;font-size:13.5px;font-weight:600;display:inline-flex;align-items:center;gap:7px;border-radius:0;margin-bottom:-1px;font-family:inherit}
+.tabs button svg{width:16px;height:16px;flex:none;opacity:.7}
+.tabs button.active{color:var(--ink);border-bottom-color:var(--accent)}
+.tabs button.active svg{opacity:1}
+.tabs button:hover{color:var(--ink)}
+button,.upload{cursor:pointer;font-family:inherit;font-size:13.5px;font-weight:600;border-radius:999px;padding:10px 20px;border:1px solid transparent;transition:background .15s,color .15s,border-color .15s}
+button.primary{background:var(--ink);color:#fff}
+button.primary:hover{background:var(--accent);color:var(--accent-ink)}
+button.secondary{background:transparent;color:var(--ink);border-color:var(--line)}
+button.secondary:hover{background:var(--paper)}
+button.danger{background:transparent;color:var(--danger);border-color:transparent;padding:10px 12px}
+button.danger:hover{text-decoration:underline}
+.upload{background:transparent;color:var(--ink);border:1.5px dashed var(--line);display:inline-flex;align-items:center;gap:8px}
+.upload:hover{background:var(--paper);border-color:var(--accent)}
+.upload svg{width:16px;height:16px;opacity:.75}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px}
+.stat-strip{display:grid;grid-template-columns:repeat(4,1fr);border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--card)}
+.stat{padding:20px 18px;border-inline-end:1px solid var(--line)}
+.stat:last-child{border-inline-end:0}
+.stat span{font-size:13px;color:var(--text-soft);display:block}
+.stat b{font-size:29px;display:block;margin-top:8px;color:var(--ink);font-weight:800;font-variant-numeric:tabular-nums}
+label{font-size:13px;font-weight:600;color:var(--ink)}
+select,input{width:100%;padding:10px 11px;border:1px solid var(--line);border-radius:8px;margin-top:6px;background:#fff;font-family:inherit;font-size:13.5px;color:var(--text)}
+select:focus,input:focus{outline:2px solid var(--accent);outline-offset:1px;border-color:var(--accent)}
+table{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
+th{background:var(--ink);color:#fff;font-weight:600}
+th,td{padding:9px 10px;border:1px solid var(--line);text-align:center}
+tbody tr:nth-child(even) td{background:#FBF9F3}
+#plot,#mlPlot{min-height:420px}
+.hidden{display:none}
+.note{background:#FBF3DF;border-inline-start:3px solid var(--accent);padding:14px 16px;border-radius:8px;line-height:1.9}
+.actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+input[type=file]{display:none}
+.langbar{display:flex;gap:2px;background:#ffffff1f;border-radius:999px;padding:3px}
+.langbar button{background:transparent;color:#fff;padding:7px 14px;border-radius:999px;font-size:12.5px;font-weight:600;font-family:inherit}
+.langbar button.active{background:#fff;color:var(--ink)}
+.hdr-right{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.filepill{background:#ffffff1a;border:1px solid #ffffff33;padding:7px 14px;border-radius:999px;font-size:12.5px;display:flex;align-items:center;gap:7px}
+.filepill svg{width:14px;height:14px;opacity:.85;flex:none}
+footer{max-width:1200px;margin:10px auto 40px;padding:18px 20px 0;border-top:1px solid var(--line);font-size:12.5px;color:var(--text-soft);text-align:center}
+.tutorial h4{margin:18px 0 4px;color:var(--ink);font-size:14.5px}
+.tutorial p{line-height:1.9;color:var(--text)}
+@media(max-width:680px){main{padding:16px}header{padding:16px}.stat-strip{grid-template-columns:repeat(2,1fr)}.stat:nth-child(2n){border-inline-end:0}}
+</style></head><body>
+<header>
+<div><b style="font-size:22px">StatMine <span style="color:var(--accent)">AI</span> Pro</b><div style="opacity:.82;font-size:12px;margin-top:3px" data-i18n="appSubtitle"></div></div>
+<div class="hdr-right">
+<div class="langbar"><button id="langFa" class="active" onclick="setLang('fa')">فارسی</button><button id="langEn" onclick="setLang('en')">English</button></div>
+<div id="fileName" class="filepill"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l4 4v13a1 1 0 0 1-1 1H7a1 1 0 0 1-1-1V4a1 1 0 0 1 1-1Z"/><path d="M13 3v5h5"/></svg><span id="fileNameText">بدون داده</span></div>
+</div>
+</header>
+<main>
+<div class="card"><div class="actions"><label class="upload"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4M8 8l4-4 4 4"/><path d="M4 15v3a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-3"/></svg><span data-i18n="uploadBtn"></span><input id="file" type="file" accept=".csv"></label><button class="secondary" onclick="downloadCSV()" data-i18n="downloadBtn"></button><button class="danger" onclick="resetAll()" data-i18n="resetBtn"></button></div><p style="font-size:13px;color:var(--text-soft)" data-i18n="uploadNote"></p></div>
+<div id="app" class="hidden">
+<div class="tabs">
+<button class="active" onclick="tab('overview',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19V11M10 19V5M16 19V14"/><path d="M2 19h20"/></svg><span data-i18n="tabOverview"></span></button>
+<button onclick="tab('explore',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="M20 20l-4.7-4.7"/></svg><span data-i18n="tabExplore"></span></button>
+<button onclick="tab('stats',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 6h11M4 12h16M4 18h8"/></svg><span data-i18n="tabStats"></span></button>
+<button onclick="tab('charts',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18v-5M9 18V8M14 18v-3M19 18v-8"/><path d="M3 6.5l4 3 4-4 5 4 4-3"/></svg><span data-i18n="tabCharts"></span></button>
+<button onclick="tab('analysis',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 3h6M10 3v5.5L5.5 17a2 2 0 0 0 1.8 3h9.4a2 2 0 0 0 1.8-3L14 8.5V3"/><path d="M7.5 14h9"/></svg><span data-i18n="tabAnalysis"></span></button>
+<button onclick="tab('data',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><ellipse cx="12" cy="5.5" rx="7" ry="2.5"/><path d="M5 5.5V12c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V5.5"/><path d="M5 12v6.5c0 1.4 3.1 2.5 7 2.5s7-1.1 7-2.5V12"/></svg><span data-i18n="tabData"></span></button>
+<button onclick="tab('ml',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="6" cy="6" r="2.2"/><circle cx="6" cy="18" r="2.2"/><circle cx="18" cy="12" r="2.2"/><path d="M8 6.8 16 11M8 17.2 16 13"/></svg><span data-i18n="tabML"></span></button>
+<button onclick="tab('help',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M12 6.5c-1.6-1.2-3.9-1.7-6.5-1.7v13c2.6 0 4.9.5 6.5 1.7 1.6-1.2 3.9-1.7 6.5-1.7v-13c-2.6 0-4.9.5-6.5 1.7Z"/><path d="M12 6.5v13"/></svg><span data-i18n="tabHelp"></span></button>
+<button onclick="tab('about',this)"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.2"/><path d="M5 20c0-3.5 3-6 7-6s7 2.5 7 6"/></svg><span data-i18n="tabAbout"></span></button>
+</div>
+<section id="overview" class="panel"><div class="stat-strip"><div class="stat"><span data-i18n="metricRows"></span><b id="rows"></b></div><div class="stat"><span data-i18n="metricCols"></span><b id="cols"></b></div><div class="stat"><span data-i18n="metricMissing"></span><b id="missing"></b></div><div class="stat"><span data-i18n="metricNumeric"></span><b id="numeric"></b></div></div><div class="card" style="margin-top:16px"><h3 data-i18n="smartReportTitle"></h3><div id="smartReport" class="note"></div></div></section>
+
+<section id="explore" class="panel hidden"><div class="card"><h3 data-i18n="exploreTitle"></h3><div class="grid"><div><label><span data-i18n="labelVariable"></span><select id="exploreVar"></select></label></div><div><label><span data-i18n="labelFilterType"></span><select id="filterType"><option value="none" data-i18n="filterNone"></option><option value="missing" data-i18n="filterMissing"></option><option value="notmissing" data-i18n="filterNotMissing"></option></select></label></div></div><br><button class="primary" onclick="showExplore()" data-i18n="showBtn"></button><div id="exploreResult"></div></div></section>
+
+<section id="stats" class="panel hidden"><div class="card"><h3 data-i18n="statsTitle"></h3><label><span data-i18n="labelVars"></span><select id="statVars" multiple size="8"></select></label><br><br><button class="primary" onclick="selectedStats()" data-i18n="calcBtn"></button><div id="statsResult" style="margin-top:15px"></div></div></section>
+
+<section id="charts" class="panel hidden"><div class="card"><div class="grid"><div><label><span data-i18n="labelChartType"></span><select id="chartType"><option value="histogram" data-i18n="chartHistogram"></option><option value="box" data-i18n="chartBox"></option><option value="scatter" data-i18n="chartScatter"></option><option value="bar" data-i18n="chartBar"></option></select></label></div><div><label><span data-i18n="labelVar1"></span><select id="xVar"></select></label></div><div><label><span data-i18n="labelVar2"></span><select id="yVar"></select></label></div></div><br><button class="primary" onclick="drawChart()" data-i18n="drawBtn"></button><div id="plot"></div></div></section>
+
+<section id="analysis" class="panel hidden"><div class="card"><h3 data-i18n="analysisAssistantTitle"></h3><div class="grid"><div><label><span data-i18n="labelGoal"></span><select id="goal"><option value="compare" data-i18n="goalCompare"></option><option value="relation" data-i18n="goalRelation"></option><option value="predict" data-i18n="goalPredict"></option></select></label></div><div><label><span data-i18n="labelResponseType"></span><select id="response"><option value="numeric" data-i18n="respNumeric"></option><option value="categorical" data-i18n="respCategorical"></option></select></label></div><div><label><span data-i18n="labelGroups"></span><select id="groups"><option value="2" data-i18n="groups2"></option><option value="3" data-i18n="groups3"></option></select></label></div></div><br><button class="primary" onclick="advise()" data-i18n="adviseBtn"></button><div id="advice" class="note" style="margin-top:14px"></div></div>
+
+<div class="card">
+<h3 data-i18n="testRunnerTitle"></h3>
+<p style="font-size:12.5px;color:var(--text-soft);margin-top:-6px" data-i18n="testRunnerNote"></p>
+<div class="grid">
+<div><label><span data-i18n="labelTestType"></span><select id="testType" onchange="onTestTypeChange()">
+<option value="ttest_one" data-i18n="testOneSample"></option>
+<option value="ttest_ind" data-i18n="testIndTtest"></option>
+<option value="ttest_paired" data-i18n="testPaired"></option>
+<option value="anova" data-i18n="testAnova"></option>
+<option value="chisq" data-i18n="testChisq"></option>
+<option value="pearson" data-i18n="testPearson"></option>
+<option value="spearman" data-i18n="testSpearman"></option>
+</select></label></div>
+<div id="testAlphaWrap"><label><span data-i18n="labelAlpha"></span><select id="testAlpha"><option value="0.05" selected>0.05</option><option value="0.01">0.01</option><option value="0.10">0.10</option></select></label></div>
+<div id="testVarNumeric1Wrap"><label><span data-i18n="labelNumericVar1"></span><select id="testVarNumeric1"></select></label></div>
+<div id="testMu0Wrap" class="hidden"><label><span data-i18n="labelMu0"></span><input id="testMu0" type="number" value="0"></label></div>
+<div id="testVarNumeric2Wrap" class="hidden"><label><span data-i18n="labelNumericVar2"></span><select id="testVarNumeric2"></select></label></div>
+<div id="testVarGroupWrap" class="hidden"><label><span data-i18n="labelGroupVar"></span><select id="testVarGroup" onchange="populateGroupLevels()"></select></label></div>
+<div id="testGroup1Wrap" class="hidden"><label><span data-i18n="labelGroup1"></span><select id="testGroup1"></select></label></div>
+<div id="testGroup2Wrap" class="hidden"><label><span data-i18n="labelGroup2"></span><select id="testGroup2"></select></label></div>
+<div id="testCatVar2Wrap" class="hidden"><label><span data-i18n="labelCatVar2"></span><select id="testCatVar2"></select></label></div>
+</div>
+<br><div class="actions"><button class="primary" onclick="runTest()" data-i18n="runTestBtn"></button></div>
+<div id="testResult" style="margin-top:16px"></div>
+<div id="testPlot" style="min-height:380px;margin-top:10px"></div>
+</div>
+
+<div class="card"><h3 data-i18n="corrTitle"></h3><button class="primary" onclick="correlation()" data-i18n="corrBtn"></button><div id="corr"></div></div></section>
+
+<section id="data" class="panel hidden"><div class="card"><h3 data-i18n="dataOptionsTitle"></h3><div class="grid"><div><label><span data-i18n="labelColumn"></span><select id="columnSelect"></select></label><button class="danger" style="margin-top:10px" onclick="dropColumn()" data-i18n="dropColBtn"></button></div><div><label><span data-i18n="labelDropMissing"></span><select id="dropMissing"><option value="" data-i18n="selectPlaceholder"></option><option value="all" data-i18n="dropMissingOption"></option></select></label><button class="danger" style="margin-top:10px" onclick="dropMissingRows()" data-i18n="applyBtn"></button></div></div></div>
+<div class="card"><h3 data-i18n="previewTitle"></h3><div style="overflow:auto"><table id="preview"></table></div></div></section>
+
+<section id="ml" class="panel hidden">
+<div class="card">
+<h3 data-i18n="mlTitle"></h3>
+<p style="font-size:12.5px;color:var(--text-soft)" data-i18n="mlDisclaimer"></p>
+<div class="grid">
+<div><label><span data-i18n="labelTarget"></span><select id="mlTarget"></select></label></div>
+<div><label><span data-i18n="labelTaskType"></span><select id="mlTaskType"><option value="auto" data-i18n="taskAuto"></option><option value="regression" data-i18n="taskRegression"></option><option value="classification" data-i18n="taskClassification"></option></select></label></div>
+<div><label><span data-i18n="labelSplit"></span><select id="mlSplit"><option value="0.2" selected>20%</option><option value="0.1">10%</option><option value="0.3">30%</option></select></label></div>
+<div><label><span data-i18n="labelK"></span><input id="mlK" type="number" value="5" min="1" max="50"></label></div>
+</div>
+<br><label><span data-i18n="labelFeatures"></span></label><select id="mlFeatures" multiple size="8"></select>
+<br><br><div class="actions"><button class="primary" onclick="runML()" data-i18n="runBtn"></button></div>
+<div id="mlTaskInfo" class="note hidden" style="margin-top:12px"></div>
+<div id="mlCompare" style="margin-top:14px"></div>
+<div id="mlDetail" style="margin-top:14px"></div>
+<div id="mlPlot" style="min-height:380px;margin-top:10px"></div>
+</div>
+</section>
+
+<section id="help" class="panel hidden"><div class="card tutorial">
+<h3 data-i18n="helpTitle"></h3>
+<div data-i18n-html="helpBody"></div>
+</div></section>
+
+<section id="about" class="panel hidden"><div class="card tutorial">
+<h3 data-i18n="aboutTitle"></h3>
+<div data-i18n-html="aboutBody"></div>
+</div></section>
+</div></main>
+<footer><span data-i18n="footerText"></span></footer>
+<script>
+let data=[],headers=[],numericVars=[],lang='fa';
+const $=id=>document.getElementById(id),num=v=>v!==''&&v!=null&&!isNaN(Number(v));
+const vals=h=>data.map(r=>Number(r[h])).filter(Number.isFinite);
+const mean=a=>a.reduce((s,x)=>s+x,0)/a.length;
+const sd=a=>a.length>1?Math.sqrt(a.reduce((s,x)=>s+(x-mean(a))**2,0)/(a.length-1)):NaN;
+const fmt=x=>Number.isFinite(x)?x.toFixed(3):'−';
+
+/* ===================== i18n ===================== */
+const L={
+ fa:{
+  appSubtitle:'تحلیل آماری، داده‌کاوی و دستیار پژوهش', noData:'بدون داده',
+  uploadBtn:'بارگذاری CSV', downloadBtn:'دانلود داده فعلی', resetBtn:'حذف داده',
+  uploadNote:'شما کنترل کامل دارید: انتخاب متغیرها، حذف ستون‌ها، فیلتر داده، انتخاب نمودار و تحلیل.',
+  tabOverview:'نمای کلی', tabExplore:'کاوش داده', tabStats:'آمار توصیفی', tabCharts:'نمودار', tabAnalysis:'تحلیل و آزمون', tabData:'مدیریت داده', tabML:'یادگیری ماشین', tabHelp:'آموزش',
+  metricRows:'مشاهدات', metricCols:'متغیرها', metricMissing:'داده گمشده', metricNumeric:'متغیر عددی',
+  smartReportTitle:'گزارش هوشمند اولیه',
+  exploreTitle:'انتخاب و فیلتر متغیر', labelVariable:'متغیر', labelFilterType:'نوع فیلتر', filterNone:'بدون فیلتر', filterMissing:'فقط داده گمشده', filterNotMissing:'فقط داده معتبر', showBtn:'نمایش',
+  statsTitle:'آمار توصیفی انتخابی', labelVars:'متغیرهای موردنظر', calcBtn:'محاسبه',
+  labelChartType:'نوع نمودار', chartHistogram:'هیستوگرام', chartBox:'باکس پلات', chartScatter:'نمودار پراکنش', chartBar:'نمودار ستونی', labelVar1:'متغیر اول', labelVar2:'متغیر دوم', drawBtn:'رسم نمودار',
+  analysisAssistantTitle:'دستیار انتخاب تحلیل', labelGoal:'هدف', goalCompare:'مقایسه', goalRelation:'رابطه', goalPredict:'پیش‌بینی', labelResponseType:'نوع پاسخ', respNumeric:'کمی', respCategorical:'کیفی', labelGroups:'تعداد گروه', groups2:'دو گروه', groups3:'سه گروه یا بیشتر', adviseBtn:'پیشنهاد تحلیل',
+  corrTitle:'ماتریس همبستگی', corrBtn:'محاسبه و رسم',
+  testRunnerTitle:'اجرای آزمون آماری', testRunnerNote:'متغیرها و آزمون موردنظر را انتخاب کنید تا آماره، درجه آزادی، p-value و اندازه اثر محاسبه شود.',
+  labelTestType:'نوع آزمون', testOneSample:'t تک‌نمونه‌ای (مقایسه میانگین با مقدار فرضی)', testIndTtest:'t مستقل (مقایسه میانگین دو گروه)', testPaired:'t زوجی (مقایسه دو اندازه‌گیری جفت‌شده)', testAnova:'ANOVA یک‌طرفه (مقایسه میانگین چند گروه)', testChisq:'Chi-square (استقلال دو متغیر کیفی)', testPearson:'همبستگی پیرسون', testSpearman:'همبستگی اسپیرمن',
+  labelAlpha:'سطح معناداری (α)', labelNumericVar1:'متغیر عددی', labelNumericVar2:'متغیر عددی دوم', labelMu0:'مقدار فرضی (μ₀)', labelGroupVar:'متغیر کیفی / گروه‌بندی', labelGroup1:'سطح گروه ۱', labelGroup2:'سطح گروه ۲', labelCatVar2:'متغیر کیفی دوم', runTestBtn:'اجرای آزمون',
+  errNeedTwoLevels:'متغیر گروه‌بندی انتخابی باید حداقل دو سطح معتبر داشته باشد.', errNeedThreeLevels:'برای ANOVA حداقل دو سطح گروه با داده کافی لازم است.', errNotEnoughData:'داده معتبر کافی برای این آزمون وجود ندارد.',
+  hypoTitle:'فرضیه‌ها', descTitle:'آمار توصیفی', resultTitle:'نتیجه آزمون', decisionSig:'با توجه به α = ', decisionSigRest:'، نتیجه از نظر آماری معنادار است (p < α).', decisionNotSig:'، نتیجه از نظر آماری معنادار نیست (p ≥ α).',
+  h0OneSample:'میانگین جامعه برابر با μ₀ است.', h1OneSample:'میانگین جامعه با μ₀ متفاوت است.',
+  h0Ind:'میانگین دو گروه برابر است.', h1Ind:'میانگین دو گروه متفاوت است.',
+  h0Paired:'میانگین تفاضل دو اندازه‌گیری صفر است.', h1Paired:'میانگین تفاضل دو اندازه‌گیری صفر نیست.',
+  h0Anova:'میانگین همه گروه‌ها برابر است.', h1Anova:'حداقل میانگین یک گروه متفاوت است.',
+  h0Chisq:'دو متغیر کیفی از هم مستقل‌اند.', h1Chisq:'دو متغیر کیفی به هم وابسته‌اند.',
+  h0Corr:'ضریب همبستگی جامعه صفر است (رابطه خطی وجود ندارد).', h1Corr:'ضریب همبستگی جامعه صفر نیست.',
+  levenePrefix:'آزمون همگنی واریانس (Brown–Forsythe): ', levenePass:'شواهدی از ناهمگنی واریانس یافت نشد؛ می‌توانید به نتیجه t با واریانس برابر (Student) اعتماد کنید.', leveneFail:'واریانس گروه‌ها همگن نیست؛ نتیجه t با واریانس نابرابر (Welch) ترجیح داده می‌شود.',
+  cellWarn:'هشدار: برخی فراوانی‌های موردانتظار کمتر از ۵ هستند؛ نتیجه آزمون Chi-square ممکن است چندان دقیق نباشد.',
+  postHocTitle:'مقایسه‌های زوجی پس از ANOVA (تعدیل Bonferroni)',
+  dataOptionsTitle:'اختیارات مدیریت داده', labelColumn:'ستون', dropColBtn:'حذف ستون انتخابی', labelDropMissing:'حذف ردیف‌های ناقص', selectPlaceholder:'انتخاب کنید', dropMissingOption:'حذف هر ردیف دارای مقدار گمشده', applyBtn:'اعمال', previewTitle:'پیش‌نمایش داده',
+  mlTitle:'پیش‌بینی با مدل‌های آماری و یادگیری ماشین',
+  mlDisclaimer:'همه محاسبات درون مرورگر شما انجام می‌شود (داده به سروری ارسال نمی‌شود). این ابزار آموزشی است: رگرسیون لجستیک با گرادیان کاهشی و منظم‌سازی L2 برازش می‌شود، p-value رگرسیون خطی بر پایه تقریب نرمال (نه t دقیق) است، و درخت تصمیم یک CART ساده با عمق محدود است. برای گزارش نهایی پژوهشی، نتایج را با نرم‌افزار آماری معتبر (R/SPSS/Python-statsmodels) صحت‌سنجی کنید.',
+  labelTarget:'متغیر هدف (پیش‌بینی‌شونده)', labelTaskType:'نوع مسئله', taskAuto:'تشخیص خودکار', taskRegression:'رگرسیون (هدف عددی)', taskClassification:'طبقه‌بندی (هدف کیفی)', labelSplit:'نسبت داده آزمون', labelK:'تعداد همسایه در KNN', labelFeatures:'متغیرهای پیش‌بین (ویژگی‌ها) — چند انتخابی', runBtn:'اجرا و مقایسه مدل‌ها',
+  helpTitle:'راهنمای استفاده از نرم‌افزار',
+  helpBody:'<p>این ابزار برای تحلیل آماری، داده‌کاوی و آموزش سریع طراحی شده است. تمام محاسبات — از آمار توصیفی تا آزمون‌های استنباطی و مدل‌های یادگیری ماشین — به‌صورت کامل و محلی درون مرورگر شما اجرا می‌شود؛ هیچ داده‌ای هرگز به هیچ سروری ارسال نمی‌شود، حتی هنگام استفاده آفلاین.</p>'+
+   '<h4>۱. بارگذاری داده</h4><p>یک فایل CSV با سطر اول به‌عنوان نام ستون‌ها بارگذاری کنید. مقادیر خالی به‌عنوان داده گمشده شناسایی می‌شوند. در هر لحظه می‌توانید نسخه پردازش‌شده داده را با «دانلود داده فعلی» ذخیره کنید یا با «حذف داده» همه‌چیز را پاک کرده و از نو شروع کنید.</p>'+
+   '<h4>۲. نمای کلی</h4><p>خلاصه‌ای سریع شامل تعداد مشاهدات (ردیف‌ها)، تعداد متغیرها (ستون‌ها)، تعداد کل مقادیر گمشده در کل جدول، و تعداد متغیرهایی که به‌صورت خودکار «عددی» تشخیص داده شده‌اند (متغیرهایی که تمام مقادیر معتبرشان قابل تبدیل به عدد باشند).</p>'+
+   '<h4>۳. کاوش داده</h4><p>یک متغیر را انتخاب کنید تا فهرست مقادیر آن را ببینید؛ فیلتر «فقط داده گمشده» برای یافتن ردیف‌های ناقص و «فقط داده معتبر» برای مشاهده مقادیر واقعی مفید است. این بخش معمولاً قدم اول در بازرسی کیفیت داده (Data Quality Check) پیش از هر تحلیلی است.</p>'+
+   '<h4>۴. آمار توصیفی</h4><p>میانگین، انحراف معیار (نااریب، با مخرج n−1)، حداقل و حداکثر برای هر ترکیب دلخواه از متغیرهای عددی، به‌صورت هم‌زمان در یک جدول.</p>'+
+   '<h4>۵. نمودار</h4><p>راهنمای انتخاب نوع نمودار:</p><ul>'+
+   '<li><b>هیستوگرام:</b> برای مشاهده شکل توزیع یک متغیر عددی (تقارن، کشیدگی، چندوجهی‌بودن).</li>'+
+   '<li><b>باکس‌پلات:</b> برای مقایسه پراکندگی و میانه، و شناسایی داده‌های پرت (outlier).</li>'+
+   '<li><b>پراکنش (Scatter):</b> برای بررسی نوع و شدت رابطه بین دو متغیر عددی.</li>'+
+   '<li><b>ستونی (Bar):</b> برای نمایش فراوانی سطوح یک متغیر کیفی.</li></ul>'+
+   '<h4>۶. تحلیل و آزمون</h4>'+
+   '<p><b>دستیار انتخاب تحلیل:</b> با مشخص‌کردن هدف پژوهش (مقایسه/رابطه/پیش‌بینی)، نوع متغیر پاسخ، و تعداد گروه‌ها، یک پیشنهاد کلی درباره آزمون یا روش مناسب دریافت می‌کنید. این بخش صرفاً راهنماست، نه تصمیم نهایی.</p>'+
+   '<p><b>اجرای آزمون آماری:</b> برخلاف دستیار بالا، این بخش واقعاً متغیرهای شما را می‌گیرد و آزمون انتخابی را با اعداد واقعی محاسبه می‌کند:</p><ul>'+
+   '<li><b>t تک‌نمونه‌ای:</b> مقایسه میانگین یک متغیر عددی با یک مقدار فرضی (μ₀). فرض پایه: توزیع تقریباً نرمال یا حجم نمونه به‌اندازه کافی بزرگ.</li>'+
+   '<li><b>t مستقل:</b> مقایسه میانگین یک متغیر عددی بین دو سطح از یک متغیر کیفی (مثلاً «مرد»/«زن»). هر دو نتیجه گزارش می‌شود: Student (با فرض واریانس برابر) و Welch (بدون این فرض)؛ آزمون Brown–Forsythe (نسخه‌ای مقاوم از Levene) به شما می‌گوید کدام را ترجیح دهید. اندازه اثر: Cohen&#39;s d.</li>'+
+   '<li><b>t زوجی:</b> برای دو اندازه‌گیری روی همان واحدها (مثل «قبل» و «بعد»)؛ فرض پایه: تفاضل‌ها تقریباً نرمال‌اند.</li>'+
+   '<li><b>ANOVA یک‌طرفه:</b> مقایسه میانگین یک متغیر عددی بین سه گروه یا بیشتر؛ اندازه اثر η² گزارش می‌شود و آزمون Brown–Forsythe همگنی واریانس گروه‌ها را بررسی می‌کند. اگر نتیجه معنادار باشد، جدول مقایسه‌های زوجی با تعدیل Bonferroni (برای کنترل خطای نوع I در مقایسه‌های چندگانه) به‌طور خودکار نمایش داده می‌شود.</li>'+
+   '<li><b>Chi-square:</b> بررسی استقلال دو متغیر کیفی از روی جدول تلاقی فراوانی‌های مشاهده‌شده و موردانتظار؛ اندازه اثر Cramér&#39;s V. اگر هر فراوانی موردانتظار کمتر از ۵ باشد، هشداری درباره دقت پایین‌تر آزمون نمایش داده می‌شود.</li>'+
+   '<li><b>همبستگی پیرسون:</b> شدت و جهت رابطه خطی بین دو متغیر عددی، به‌همراه فاصله اطمینان ۹۵٪ (با تبدیل فیشر). فرض پایه: توزیع دومتغیره تقریباً نرمال.</li>'+
+   '<li><b>همبستگی اسپیرمن:</b> نسخه مبتنی بر رتبه که نیازی به فرض نرمال بودن ندارد و برای روابط یکنوای غیرخطی نیز مناسب است.</li></ul>'+
+   '<p>برای هر آزمون، فرضیه صفر (H0) و مقابل (H1)، آماره آزمون، درجه آزادی، p-value دقیق، اندازه اثر، و یک جمله تصمیم‌گیری بر پایه سطح معناداری (α) انتخابی شما نمایش داده می‌شود. توجه کنید که p کوچک‌تر از α به‌معنای «معناداری آماری» است، نه لزوماً «اهمیت عملی» — همیشه اندازه اثر را هم در نظر بگیرید. الگوریتم‌های p-value این ابزار (بر پایه توابع بتای ناقص و گامای ناقص) با مقادیر بحرانی جدول‌های آماری استاندارد و خروجی کتابخانه‌های آماری مرجع صحت‌سنجی شده‌اند.</p>'+
+   '<p><b>ماتریس همبستگی:</b> یک نمای کلی هم‌زمان از همبستگی پیرسون میان همه متغیرهای عددی، به‌صورت نقشه حرارتی.</p>'+
+   '<h4>۷. مدیریت داده</h4><p>حذف ستون‌های ناخواسته، یا حذف تمام ردیف‌هایی که حداقل یک مقدار گمشده دارند (برای آماده‌سازی داده جهت مدل‌سازی کامل).</p>'+
+   '<h4>۸. یادگیری ماشین</h4><p>متغیر هدف و ویژگی‌های پیش‌بین را انتخاب کنید. اگر هدف عددی باشد، رگرسیون خطی، KNN رگرسیونی و درخت تصمیم اجرا و بر اساس R² مقایسه می‌شوند؛ اگر هدف کیفی باشد (و دو رده داشته باشد)، رگرسیون لجستیک نیز افزوده می‌شود و مدل‌ها بر اساس دقت مقایسه می‌گردند. R² نزدیک ۱ یعنی برازش بهتر روی داده آزمون؛ دقت نزدیک ۱۰۰٪ یعنی طبقه‌بندی بهتر — اما همیشه به تعداد مشاهدات آزمون و تعادل رده‌ها هم توجه کنید. داده به‌صورت خودکار به آموزش/آزمون تقسیم می‌شود تا از ارزیابی روی داده دیده‌نشده مطمئن شوید.</p>'+
+   '<h4>حریم خصوصی</h4><p>تمام پردازش‌ها — از خواندن فایل CSV تا سنگین‌ترین محاسبات آماری و یادگیری ماشین — درون مرورگر شما و با جاوااسکریپت اجرا می‌شود. هیچ داده‌ای آپلود، ذخیره یا به سروری ارسال نمی‌شود.</p>'+
+   '<h4>نصب به‌صورت اپلیکیشن روی اندروید</h4><p>اگر این فایل‌ها (همراه با manifest.json و sw.js) روی یک میزبان وب با HTTPS قرار گیرد، با باز کردن صفحه در مرورگر Chrome روی گوشی اندروید، گزینه «افزودن به صفحه اصلی / نصب برنامه» ظاهر می‌شود و برنامه مانند یک اپلیکیشن نصب‌شده روی گوشی در دسترس خواهد بود.</p>',
+  tabAbout:'درباره',
+  aboutTitle:'درباره تهیه‌کننده',
+  aboutBody:'<div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px"><div style="width:78px;height:78px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;flex:none">ع.ص</div><div style="flex:1;min-width:220px"><h4 style="margin:0 0 3px;font-size:18px;color:var(--ink)">علیرضا صفریان</h4><p style="margin:0;color:var(--text-soft)">عضو هیأت علمی گروه آمار، دانشگاه جهرم</p></div></div>'+
+   '<h4>حوزه‌های پژوهشی</h4><ul>'+
+   '<li>روش‌شناسی نمونه‌گیری رتبه‌ای (Ranked Set Sampling) و توزیع‌های وابسته مانند Inverse Kumaraswamy</li>'+
+   '<li>نظریه برآورد کوچک‌سازی (Shrinkage Estimation) با تکیه بر چارچوب‌های کلاسیک (Saleh، Bancroft، James–Stein، Judge–Bock)</li>'+
+   '<li>مدل‌های قابلیت اطمینان تنش–مقاومت (Stress-Strength Reliability) و برآورد R = P(X&lt;Y)، از جمله مدل‌های چندمؤلفه‌ای</li>'+
+   '<li>گشتاورهای وزن‌دار احتمال (PWM) و گشتاورهای L (بر پایه Hosking)</li>'+
+   '<li>تحلیل بقا و انتخاب متغیر با رویکردهای اطلاعاتی (فاصله رنی–هلینگر، اصل MDL)</li>'+
+   '<li>روش‌های نمونه‌گیری شبکه‌ای (Network Sampling) برای برآورد پارامترهای مرکزیت</li></ul>'+
+   '<h4>فعالیت‌های آموزشی و پژوهشی</h4><ul>'+
+   '<li>راهنمایی پایان‌نامه‌های کارشناسی ارشد در حوزه آمار کاربردی، قابلیت اطمینان و تحلیل بقا</li>'+
+   '<li>مشارکت در اجتماعات علمی بین‌المللی از جمله ISLP (International Statistical Literacy Project)</li>'+
+   '<li>تألیف مقالات و پایان‌نامه‌ها با تایپ‌ست XePersian LaTeX و شبیه‌سازی در R و Python</li></ul>'+
+   '<p style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--text-soft)">این نرم‌افزار (StatMine AI Pro) توسط ایشان طراحی و توسعه داده شده تا ابزاری سریع، دوزبانه و بدون‌نیاز‌به‌نصب برای تحلیل آماری، داده‌کاوی و آموزش در اختیار دانشجویان و پژوهشگران قرار دهد.</p>',
+  footerText:'تهیه‌کننده: علیرضا صفریان — گروه آمار، دانشگاه جهرم'
+ },
+ en:{
+  appSubtitle:'Statistical Analysis, Data Mining & Research Assistant', noData:'No data',
+  uploadBtn:'Upload CSV', downloadBtn:'Download current data', resetBtn:'Clear data',
+  uploadNote:'You have full control: select variables, remove columns, filter data, choose charts and analysis.',
+  tabOverview:'Overview', tabExplore:'Explore Data', tabStats:'Descriptive Stats', tabCharts:'Charts', tabAnalysis:'Analysis & Tests', tabData:'Data Management', tabML:'Machine Learning', tabHelp:'Tutorial',
+  metricRows:'Observations', metricCols:'Variables', metricMissing:'Missing values', metricNumeric:'Numeric variables',
+  smartReportTitle:'Initial Smart Report',
+  exploreTitle:'Select & Filter Variable', labelVariable:'Variable', labelFilterType:'Filter type', filterNone:'No filter', filterMissing:'Missing values only', filterNotMissing:'Valid values only', showBtn:'Show',
+  statsTitle:'Selected Descriptive Statistics', labelVars:'Variables of interest', calcBtn:'Calculate',
+  labelChartType:'Chart type', chartHistogram:'Histogram', chartBox:'Box plot', chartScatter:'Scatter plot', chartBar:'Bar chart', labelVar1:'Variable 1', labelVar2:'Variable 2', drawBtn:'Draw chart',
+  analysisAssistantTitle:'Analysis Selection Assistant', labelGoal:'Goal', goalCompare:'Compare', goalRelation:'Relationship', goalPredict:'Predict', labelResponseType:'Response type', respNumeric:'Numeric', respCategorical:'Categorical', labelGroups:'Number of groups', groups2:'Two groups', groups3:'Three groups or more', adviseBtn:'Suggest analysis',
+  corrTitle:'Correlation Matrix', corrBtn:'Compute & plot',
+  testRunnerTitle:'Run a Statistical Test', testRunnerNote:'Choose the variables and test you need; the test statistic, degrees of freedom, p-value, and effect size are computed for you.',
+  labelTestType:'Test type', testOneSample:'One-sample t-test (mean vs. a hypothesized value)', testIndTtest:'Independent-samples t-test (compare two group means)', testPaired:'Paired t-test (compare two paired measurements)', testAnova:'One-way ANOVA (compare means across groups)', testChisq:'Chi-square (independence of two categorical variables)', testPearson:'Pearson correlation', testSpearman:'Spearman correlation',
+  labelAlpha:'Significance level (α)', labelNumericVar1:'Numeric variable', labelNumericVar2:'Second numeric variable', labelMu0:'Hypothesized value (μ₀)', labelGroupVar:'Categorical / grouping variable', labelGroup1:'Group level 1', labelGroup2:'Group level 2', labelCatVar2:'Second categorical variable', runTestBtn:'Run test',
+  errNeedTwoLevels:'The selected grouping variable must have at least two valid levels.', errNeedThreeLevels:'ANOVA requires at least two group levels with enough data.', errNotEnoughData:'Not enough valid data for this test.',
+  hypoTitle:'Hypotheses', descTitle:'Descriptive statistics', resultTitle:'Test result', decisionSig:'At α = ', decisionSigRest:', the result is statistically significant (p < α).', decisionNotSig:', the result is not statistically significant (p ≥ α).',
+  h0OneSample:'The population mean equals μ₀.', h1OneSample:'The population mean differs from μ₀.',
+  h0Ind:'The two group means are equal.', h1Ind:'The two group means differ.',
+  h0Paired:'The mean difference between the two measurements is zero.', h1Paired:'The mean difference is not zero.',
+  h0Anova:'All group means are equal.', h1Anova:'At least one group mean differs.',
+  h0Chisq:'The two categorical variables are independent.', h1Chisq:'The two categorical variables are associated.',
+  h0Corr:'The population correlation coefficient is zero (no linear relationship).', h1Corr:'The population correlation coefficient is not zero.',
+  levenePrefix:'Test of homogeneity of variance (Brown–Forsythe): ', levenePass:'No evidence of unequal variances; the equal-variance (Student) t-test result can be trusted.', leveneFail:'Group variances are not homogeneous; the unequal-variance (Welch) t-test result is preferred.',
+  cellWarn:'Warning: some expected cell frequencies are below 5; the chi-square result may not be very accurate.',
+  postHocTitle:'Pairwise comparisons after ANOVA (Bonferroni-adjusted)',
+  dataOptionsTitle:'Data Management Options', labelColumn:'Column', dropColBtn:'Remove selected column', labelDropMissing:'Remove incomplete rows', selectPlaceholder:'Select...', dropMissingOption:'Remove any row with a missing value', applyBtn:'Apply', previewTitle:'Data Preview',
+  mlTitle:'Prediction with Statistical & Machine Learning Models',
+  mlDisclaimer:'All computation runs in your browser (no data is sent to any server). This is an educational tool: logistic regression is fit via gradient descent with L2 regularization, linear-regression p-values use a normal approximation (not the exact t-distribution), and the decision tree is a simple depth-limited CART. For a final research report, validate results with established statistical software (R / SPSS / Python-statsmodels).',
+  labelTarget:'Target variable (to predict)', labelTaskType:'Problem type', taskAuto:'Auto-detect', taskRegression:'Regression (numeric target)', taskClassification:'Classification (categorical target)', labelSplit:'Test data ratio', labelK:'Number of neighbors (KNN)', labelFeatures:'Predictor variables (features) — multi-select', runBtn:'Run & compare models',
+  helpTitle:'How to use this software',
+  helpBody:'<p>This tool is built for fast statistical analysis, data mining, and teaching. Every computation — from descriptive statistics to inferential tests and machine learning models — runs entirely inside your browser; no data is ever uploaded or sent to a server, even offline.</p>'+
+   '<h4>1. Upload data</h4><p>Upload a CSV file with column names in the first row. Empty cells are treated as missing values. At any point you can save the processed data with "Download current data" or wipe everything with "Clear data" to start over.</p>'+
+   '<h4>2. Overview</h4><p>A quick summary: the number of observations (rows), the number of variables (columns), the total count of missing values across the whole table, and how many variables were automatically detected as "numeric" (every valid value in the column can be converted to a number).</p>'+
+   '<h4>3. Explore Data</h4><p>Pick a variable to see its list of values; "missing values only" helps you find incomplete rows, and "valid values only" shows the actual entries. This is usually the first step of a data-quality check before any analysis.</p>'+
+   '<h4>4. Descriptive Stats</h4><p>Mean, (unbiased, n-1) standard deviation, minimum, and maximum for any combination of numeric variables, all in one table.</p>'+
+   '<h4>5. Charts</h4><p>Guide to choosing a chart type:</p><ul>'+
+   '<li><b>Histogram:</b> see the shape of a numeric variable&#39;s distribution (symmetry, skew, multiple modes).</li>'+
+   '<li><b>Box plot:</b> compare spread and median, and spot outliers.</li>'+
+   '<li><b>Scatter plot:</b> examine the type and strength of a relationship between two numeric variables.</li>'+
+   '<li><b>Bar chart:</b> show the frequency of the levels of a categorical variable.</li></ul>'+
+   '<h4>6. Analysis & Tests</h4>'+
+   '<p><b>Analysis Selection Assistant:</b> by specifying your research goal (compare/relationship/predict), the response type, and the number of groups, you get a general suggestion for a suitable test or method. This is guidance only, not the final decision.</p>'+
+   '<p><b>Run a Statistical Test:</b> unlike the assistant above, this section actually takes your variables and computes the chosen test on real numbers:</p><ul>'+
+   '<li><b>One-sample t-test:</b> compares the mean of a numeric variable to a hypothesized value (&mu;&#8320;). Assumption: an approximately normal distribution or a large enough sample.</li>'+
+   '<li><b>Independent-samples t-test:</b> compares the mean of a numeric variable between two levels of a categorical variable. Both results are reported: Student&#39;s (assuming equal variances) and Welch&#39;s (not assuming equal variances); a Brown&ndash;Forsythe test (a robust version of Levene&#39;s test) tells you which to prefer. Effect size: Cohen&#39;s d.</li>'+
+   '<li><b>Paired t-test:</b> for two measurements on the same units (e.g., "before" and "after"). Assumption: the differences are approximately normal.</li>'+
+   '<li><b>One-way ANOVA:</b> compares the mean of a numeric variable across three or more groups; the &eta;&sup2; effect size is reported, and a Brown&ndash;Forsythe test checks homogeneity of variance across groups. If the result is significant, a table of Bonferroni-adjusted pairwise comparisons (controlling Type I error across multiple comparisons) appears automatically.</li>'+
+   '<li><b>Chi-square:</b> tests independence of two categorical variables from a contingency table of observed vs. expected frequencies; effect size Cram&eacute;r&#39;s V. A warning appears if any expected cell frequency is below 5.</li>'+
+   '<li><b>Pearson correlation:</b> the strength and direction of a linear relationship between two numeric variables, with a 95% confidence interval (via Fisher&#39;s z-transform). Assumption: an approximately bivariate-normal distribution.</li>'+
+   '<li><b>Spearman correlation:</b> a rank-based version that doesn&#39;t require normality and also works for monotonic non-linear relationships.</li></ul>'+
+   '<p>For every test, the null (H0) and alternative (H1) hypotheses, the test statistic, degrees of freedom, exact p-value, effect size, and a decision sentence based on your chosen significance level (&alpha;) are shown. Note that p &lt; &alpha; means "statistically significant," not necessarily "practically important" &mdash; always consider the effect size too. This tool&#39;s p-value algorithms (based on the incomplete beta and incomplete gamma functions) have been validated against standard statistical-table critical values and reference statistical-library output.</p>'+
+   '<p><b>Correlation Matrix:</b> an at-a-glance view of Pearson correlations among all numeric variables, as a heatmap.</p>'+
+   '<h4>7. Data Management</h4><p>Remove unwanted columns, or drop every row that has at least one missing value (to prepare complete data for modeling).</p>'+
+   '<h4>8. Machine Learning</h4><p>Choose a target variable and predictor features. If the target is numeric, Linear Regression, KNN Regression, and a Decision Tree are run and compared by R&sup2;; if the target is categorical (with two classes), Logistic Regression is added too and models are compared by accuracy. R&sup2; near 1 means a better fit on the test data; accuracy near 100% means better classification &mdash; but always factor in the number of test observations and class balance. Data is automatically split into train/test so evaluation happens on unseen data.</p>'+
+   '<h4>Privacy</h4><p>Everything &mdash; from reading the CSV file to the heaviest statistical and machine-learning computation &mdash; runs inside your browser in JavaScript. No data is ever uploaded, stored, or sent to a server.</p>'+
+   '<h4>Installing as an Android app</h4><p>If these files (along with manifest.json and sw.js) are hosted on an HTTPS web host, opening the page in Chrome on an Android phone will show an "Add to Home Screen / Install app" option, making it available like an installed app on the device.</p>',
+  tabAbout:'About',
+  aboutTitle:'About the developer',
+  aboutBody:'<div style="display:flex;gap:18px;align-items:flex-start;flex-wrap:wrap;margin-bottom:16px"><div style="width:78px;height:78px;border-radius:50%;background:var(--ink);color:#fff;display:flex;align-items:center;justify-content:center;font-size:26px;font-weight:800;flex:none">AS</div><div style="flex:1;min-width:220px"><h4 style="margin:0 0 3px;font-size:18px;color:var(--ink)">Alireza Safariyan</h4><p style="margin:0;color:var(--text-soft)">Faculty member, Department of Statistics, Jahrom University</p></div></div>'+
+   '<h4>Research interests</h4><ul>'+
+   '<li>Ranked Set Sampling (RSS) methodology and related distributions such as the Inverse Kumaraswamy</li>'+
+   '<li>Shrinkage estimation theory, building on classical frameworks (Saleh, Bancroft, James&ndash;Stein, Judge&ndash;Bock)</li>'+
+   '<li>Stress-strength reliability models and estimation of R = P(X&lt;Y), including multicomponent models</li>'+
+   '<li>Probability-weighted moments (PWM) and L-moments (following Hosking)</li>'+
+   '<li>Survival analysis and variable selection via information-theoretic approaches (R&eacute;nyi&ndash;Hellinger distance, the MDL principle)</li>'+
+   '<li>Network sampling methods for estimating centrality parameters</li></ul>'+
+   '<h4>Teaching & research activity</h4><ul>'+
+   '<li>Supervising Master&#39;s theses in applied statistics, reliability, and survival analysis</li>'+
+   '<li>Engagement with international scientific communities, including the ISLP (International Statistical Literacy Project)</li>'+
+   '<li>Authoring papers and theses typeset in XePersian LaTeX, with simulations in R and Python</li></ul>'+
+   '<p style="margin-top:16px;padding-top:14px;border-top:1px solid var(--line);font-size:12.5px;color:var(--text-soft)">StatMine AI Pro was designed and developed by him to give students and researchers a fast, bilingual, install-free tool for statistical analysis, data mining, and teaching.</p>',
+  footerText:'Developed by: Alireza Safariyan — Department of Statistics, Jahrom University'
+ }
+};
+
+function applyI18n(){
+ document.documentElement.lang=lang; document.documentElement.dir=lang==='fa'?'rtl':'ltr';
+ document.querySelectorAll('[data-i18n]').forEach(el=>{let k=el.getAttribute('data-i18n');if(L[lang][k]!=null)el.textContent=L[lang][k]});
+ document.querySelectorAll('[data-i18n-html]').forEach(el=>{let k=el.getAttribute('data-i18n-html');if(L[lang][k]!=null)el.innerHTML=L[lang][k]});
+ $('langFa').classList.toggle('active',lang==='fa'); $('langEn').classList.toggle('active',lang==='en');
+ if(!data.length)$('fileNameText').textContent=L[lang].noData;
+}
+function setLang(l){
+ lang=l; applyI18n();
+ ['exploreResult','statsResult','advice','corr','mlTaskInfo','mlCompare','mlDetail','testResult'].forEach(id=>{if($(id))$(id).innerHTML=''});
+ if($('mlTaskInfo'))$('mlTaskInfo').classList.add('hidden');
+ try{Plotly.purge('plot')}catch(e){} try{Plotly.purge('mlPlot')}catch(e){} try{Plotly.purge('testPlot')}catch(e){}
+ if(data.length)refresh();
+}
+applyI18n();
+
+/* ===================== core app ===================== */
+$('file').onchange=e=>{let f=e.target.files[0];if(!f)return;$('fileNameText').textContent=f.name;Papa.parse(f,{header:true,skipEmptyLines:true,complete:r=>{headers=r.meta.fields;data=r.data;refresh()}})};
+function refresh(){
+ numericVars=headers.filter(h=>{let a=data.map(r=>r[h]).filter(v=>v!==''&&v!=null);return a.length&&a.every(num)});
+ $('app').classList.remove('hidden');$('rows').textContent=data.length;$('cols').textContent=headers.length;
+ let miss=data.reduce((s,r)=>s+headers.filter(h=>r[h]===''||r[h]==null).length,0);$('missing').textContent=miss;$('numeric').textContent=numericVars.length;
+ let options=headers.map(h=>`<option value="${h}">${h}</option>`).join('');
+ ['exploreVar','xVar','yVar','columnSelect','mlTarget'].forEach(id=>$(id).innerHTML=options);
+ $('statVars').innerHTML=headers.map(h=>`<option value="${h}">${h}</option>`).join('');
+ $('mlFeatures').innerHTML=headers.map(h=>`<option value="${h}">${h}</option>`).join('');
+ let numOptions=numericVars.map(h=>`<option value="${h}">${h}</option>`).join('');
+ $('testVarNumeric1').innerHTML=numOptions; $('testVarNumeric2').innerHTML=numOptions;
+ $('testVarGroup').innerHTML=options; $('testCatVar2').innerHTML=options;
+ populateGroupLevels(); onTestTypeChange();
+ $('smartReport').innerHTML = lang==='fa'
+  ? `داده شما شامل <b>${data.length}</b> مشاهده و <b>${headers.length}</b> متغیر است. تعداد مقادیر گمشده <b>${miss}</b> است. <b>${numericVars.length}</b> متغیر عددی شناسایی شد. برای تحلیل دقیق‌تر، متغیرهای موردنظر و هدف پژوهش را در بخش تحلیل انتخاب کنید.`
+  : `Your data contains <b>${data.length}</b> observations and <b>${headers.length}</b> variables. There are <b>${miss}</b> missing values. <b>${numericVars.length}</b> numeric variables were detected. For deeper analysis, choose your variables and research goal in the Analysis tab.`;
+ preview();
+}
+function preview(){let t='<tr>'+headers.map(h=>'<th>'+h+'</th>').join('')+'</tr>';data.slice(0,20).forEach(r=>t+='<tr>'+headers.map(h=>'<td>'+String(r[h]??'')+'</td>').join('')+'</tr>');$('preview').innerHTML=t}
+function tab(id,b){document.querySelectorAll('.panel').forEach(x=>x.classList.add('hidden'));$(id).classList.remove('hidden');document.querySelectorAll('.tabs button').forEach(x=>x.classList.remove('active'));b.classList.add('active')}
+function showExplore(){let h=$('exploreVar').value,type=$('filterType').value,arr=data.map(r=>r[h]);if(type==='missing')arr=arr.filter(v=>v===''||v==null);if(type==='notmissing')arr=arr.filter(v=>v!==''&&v!=null);
+ let l1=lang==='fa'?'تعداد مقادیر انتخاب‌شده':'Selected value count',l2=lang==='fa'?'نمونه':'Sample',sep=lang==='fa'?'، ':', ';
+ $('exploreResult').innerHTML=`<div class="note">${l1}: <b>${arr.length}</b><br>${l2}: ${arr.slice(0,15).join(sep)}</div>`}
+function selectedStats(){let hs=[...$('statVars').selectedOptions].map(o=>o.value);
+ let hdrs=lang==='fa'?['متغیر','n','میانگین','SD','حداقل','حداکثر']:['Variable','n','Mean','SD','Min','Max'];
+ let t='<table><tr>'+hdrs.map(h=>`<th>${h}</th>`).join('')+'</tr>';
+ hs.forEach(h=>{let a=vals(h);if(a.length)t+=`<tr><td>${h}</td><td>${a.length}</td><td>${fmt(mean(a))}</td><td>${fmt(sd(a))}</td><td>${fmt(Math.min(...a))}</td><td>${fmt(Math.max(...a))}</td></tr>`});$('statsResult').innerHTML=t+'</table>'}
+function drawChart(){let type=$('chartType').value,x=$('xVar').value,y=$('yVar').value;
+ const T=lang==='fa'?{vs:'در برابر',hist:'هیستوگرام',box:'باکس پلات',freq:'فراوانی'}:{vs:'vs',hist:'Histogram of',box:'Box plot of',freq:'Frequency of'};
+ if(type==='scatter'){let a=data.filter(r=>num(r[x])&&num(r[y]));Plotly.newPlot('plot',[{x:a.map(r=>+r[x]),y:a.map(r=>+r[y]),mode:'markers',type:'scatter'}],{title:`${x} ${T.vs} ${y}`});}
+ else if(type==='histogram')Plotly.newPlot('plot',[{x:vals(x),type:'histogram'}],{title:`${T.hist} ${x}`});
+ else if(type==='box')Plotly.newPlot('plot',[{y:vals(x),type:'box',name:x}],{title:`${T.box} ${x}`});
+ else {let counts={};data.forEach(r=>counts[r[x]]=(counts[r[x]]||0)+1);Plotly.newPlot('plot',[{x:Object.keys(counts),y:Object.values(counts),type:'bar'}],{title:`${T.freq} ${x}`});}}
+const ADVICE_TEXT={
+ fa:{compare_numeric_2:'آزمون پیشنهادی: t مستقل. پیش‌فرض نرمال بودن و همگنی واریانس را بررسی کنید.',compare_numeric_3:'آزمون پیشنهادی: ANOVA. در صورت معناداری، آزمون‌های تعقیبی انجام دهید.',compare_categorical:'آزمون پیشنهادی: Chi-square.',relation_numeric:'پیشنهاد: Pearson. در صورت نقض فرض‌های مناسب، Spearman را بررسی کنید.',relation_categorical:'پیشنهاد: Chi-square یا مدل‌های طبقه‌ای.',predict_numeric:'پیشنهاد: رگرسیون خطی، Random Forest و XGBoost با Cross Validation.',predict_categorical:'پیشنهاد: Logistic Regression، Random Forest و XGBoost.',adviceFooter:'شما می‌توانید روش را تغییر دهید. برنامه باید پیشنهاددهنده باشد، نه تصمیم‌گیرنده نهایی.'},
+ en:{compare_numeric_2:'Suggested test: Independent-samples t-test. Check the assumptions of normality and homogeneity of variance.',compare_numeric_3:'Suggested test: ANOVA. If significant, run post-hoc tests.',compare_categorical:'Suggested test: Chi-square.',relation_numeric:'Suggestion: Pearson correlation. If assumptions are violated, consider Spearman.',relation_categorical:'Suggestion: Chi-square or categorical models.',predict_numeric:'Suggestion: Linear Regression, Random Forest, and XGBoost with Cross-Validation.',predict_categorical:'Suggestion: Logistic Regression, Random Forest, and XGBoost.',adviceFooter:'You can change the method. This tool should advise, not make the final decision.'}
+};
+function advise(){let g=$('goal').value,r=$('response').value,n=$('groups').value,T=ADVICE_TEXT[lang],msg='';
+ if(g==='compare')msg=r==='numeric'?(n==='2'?T.compare_numeric_2:T.compare_numeric_3):T.compare_categorical;
+ if(g==='relation')msg=r==='numeric'?T.relation_numeric:T.relation_categorical;
+ if(g==='predict')msg=r==='numeric'?T.predict_numeric:T.predict_categorical;
+ $('advice').innerHTML='<b>'+msg+'</b><br>'+T.adviceFooter}
+function correlation(){let hs=numericVars;if(hs.length<2){$('corr').innerHTML=lang==='fa'?'حداقل دو متغیر عددی لازم است.':'At least two numeric variables are required.';return}
+ let z=hs.map(a=>hs.map(b=>{let pairs=data.filter(r=>num(r[a])&&num(r[b]));let x=pairs.map(r=>+r[a]),y=pairs.map(r=>+r[b]),mx=mean(x),my=mean(y);let c=x.reduce((s,v,i)=>s+(v-mx)*(y[i]-my),0);let d=Math.sqrt(x.reduce((s,v)=>s+(v-mx)**2,0)*y.reduce((s,v)=>s+(v-my)**2,0));return d?c/d:0}));
+ Plotly.newPlot('corr',[{z,x:hs,y:hs,type:'heatmap'}],{title:lang==='fa'?'ماتریس همبستگی':'Correlation Matrix'})}
+
+/* ===================== Inferential statistics engine ===================== */
+const fmt4=x=>Number.isFinite(x)?x.toFixed(4):'−';
+function gammln(x){const cof=[76.18009172947146,-86.50532032941677,24.01409824083091,-1.231739572450155,0.1208650973866179e-2,-0.5395239384953e-5];let y=x,tmp=x+5.5;tmp-=(x+0.5)*Math.log(tmp);let ser=1.000000000190015;for(let j=0;j<6;j++){y+=1;ser+=cof[j]/y}return -tmp+Math.log(2.5066282746310005*ser/x)}
+function gser(a,x){const ITMAX=200,EPS=3e-9;let gln=gammln(a);if(x<=0)return 0;let ap=a,sum=1/a,del=sum;for(let n=1;n<=ITMAX;n++){ap+=1;del*=x/ap;sum+=del;if(Math.abs(del)<Math.abs(sum)*EPS)break}return sum*Math.exp(-x+a*Math.log(x)-gln)}
+function gcf(a,x){const ITMAX=200,EPS=3e-9,FPMIN=1e-300;let gln=gammln(a);let b=x+1-a,c=1/FPMIN,d=1/b,h=d;for(let i=1;i<=ITMAX;i++){let an=-i*(i-a);b+=2;d=an*d+b;if(Math.abs(d)<FPMIN)d=FPMIN;c=b+an/c;if(Math.abs(c)<FPMIN)c=FPMIN;d=1/d;let del=d*c;h*=del;if(Math.abs(del-1)<EPS)break}return Math.exp(-x+a*Math.log(x)-gln)*h}
+function gammq(a,x){return x<a+1?1-gser(a,x):gcf(a,x)}
+function betacf(a,b,x){const MAXIT=200,EPS=3e-9,FPMIN=1e-300;let qab=a+b,qap=a+1,qam=a-1;let c=1,d=1-qab*x/qap;if(Math.abs(d)<FPMIN)d=FPMIN;d=1/d;let h=d;for(let m=1;m<=MAXIT;m++){let m2=2*m;let aa=m*(b-m)*x/((qam+m2)*(a+m2));d=1+aa*d;if(Math.abs(d)<FPMIN)d=FPMIN;c=1+aa/c;if(Math.abs(c)<FPMIN)c=FPMIN;d=1/d;h*=d*c;aa=-(a+m)*(qab+m)*x/((a+m2)*(qap+m2));d=1+aa*d;if(Math.abs(d)<FPMIN)d=FPMIN;c=1+aa/c;if(Math.abs(c)<FPMIN)c=FPMIN;d=1/d;let del=d*c;h*=del;if(Math.abs(del-1)<EPS)break}return h}
+function betai(a,b,x){if(x<=0)return 0;if(x>=1)return 1;let bt=Math.exp(gammln(a+b)-gammln(a)-gammln(b)+a*Math.log(x)+b*Math.log(1-x));return x<(a+1)/(a+b+2)?bt*betacf(a,b,x)/a:1-bt*betacf(b,a,1-x)/b}
+function tTwoTailP(t,df){return betai(df/2,0.5,df/(df+t*t))}
+function fUpperP(F,d1,d2){if(F<=0)return 1;return 1-betai(d1/2,d2/2,d1*F/(d1*F+d2))}
+function chisqUpperP(x,df){return gammq(df/2,x/2)}
+function median(a){let s=[...a].sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2}
+function rankArray(arr){let idx=arr.map((v,i)=>i).sort((a,b)=>arr[a]-arr[b]);let ranks=Array(arr.length);let i=0;while(i<idx.length){let j=i;while(j+1<idx.length&&arr[idx[j+1]]===arr[idx[i]])j++;let avg=(i+j)/2+1;for(let k=i;k<=j;k++)ranks[idx[k]]=avg;i=j+1}return ranks}
+function pearsonR(x,y){let mx=mean(x),my=mean(y);let n=x.reduce((s,v,i)=>s+(v-mx)*(y[i]-my),0);let dx=Math.sqrt(x.reduce((s,v)=>s+(v-mx)**2,0)),dy=Math.sqrt(y.reduce((s,v)=>s+(v-my)**2,0));return (dx&&dy)?n/(dx*dy):0}
+function oneWayF(groupsVals){let all=groupsVals.flat(),grand=mean(all),N=all.length,k=groupsVals.length;let ssb=groupsVals.reduce((s,g)=>s+g.length*(mean(g)-grand)**2,0);let ssw=groupsVals.reduce((s,g)=>s+g.reduce((ss,x)=>ss+(x-mean(g))**2,0),0);let dfb=k-1,dfw=N-k;return {ssb,ssw,dfb,dfw,msb:ssb/dfb,msw:ssw/dfw,F:(ssb/dfb)/(ssw/dfw)}}
+
+function onTestTypeChange(){
+ let t=$('testType').value;
+ const show=(id,v)=>$(id).classList.toggle('hidden',!v);
+ show('testVarNumeric1Wrap', t!=='chisq');
+ show('testMu0Wrap', t==='ttest_one');
+ show('testVarNumeric2Wrap', t==='ttest_paired'||t==='pearson'||t==='spearman');
+ show('testVarGroupWrap', t==='ttest_ind'||t==='anova'||t==='chisq');
+ show('testGroup1Wrap', t==='ttest_ind');
+ show('testGroup2Wrap', t==='ttest_ind');
+ show('testCatVar2Wrap', t==='chisq');
+ if(t==='ttest_ind') populateGroupLevels();
+}
+function populateGroupLevels(){
+ if(!data.length||!$('testVarGroup').value) return;
+ let g=$('testVarGroup').value;
+ let levels=[...new Set(data.map(r=>r[g]).filter(v=>v!==''&&v!=null).map(String))];
+ let opts=levels.map(l=>`<option value="${l}">${l}</option>`).join('');
+ $('testGroup1').innerHTML=opts; $('testGroup2').innerHTML=opts;
+ if(levels.length>1) $('testGroup2').value=levels[1];
+}
+function runTest(){
+ let t=$('testType').value, alpha=Number($('testAlpha').value), T=L[lang];
+ const decisionText=p=>`${T.decisionSig}${alpha}${p<alpha?T.decisionSigRest:T.decisionNotSig}`;
+ const hyp=(h0,h1)=>`<div class="note"><b>${T.hypoTitle}</b><br>H0: ${h0}<br>H1: ${h1}</div>`;
+ let resultHtml='', plotData=null, plotLayout=null;
+
+ if(t==='ttest_one'){
+  let v=$('testVarNumeric1').value, mu0=Number($('testMu0').value)||0, a=vals(v);
+  if(a.length<3){$('testResult').innerHTML=`<div class="note">${T.errNotEnoughData}</div>`;Plotly.purge('testPlot');return}
+  let n=a.length,m=mean(a),s=sd(a),se=s/Math.sqrt(n),df=n-1,tstat=(m-mu0)/se,p=tTwoTailP(Math.abs(tstat),df),d=(m-mu0)/s;
+  resultHtml=hyp(T.h0OneSample,T.h1OneSample)+
+   `<table style="margin-top:12px"><tr><th>n</th><th>Mean</th><th>SD</th><th>μ₀</th></tr><tr><td>${n}</td><td>${fmt(m)}</td><td>${fmt(s)}</td><td>${fmt(mu0)}</td></tr></table>`+
+   `<table style="margin-top:12px"><tr><th>t</th><th>df</th><th>p-value</th><th>Cohen's d</th></tr><tr><td>${fmt(tstat)}</td><td>${df}</td><td>${fmt4(p)}</td><td>${fmt(d)}</td></tr></table>`+
+   `<div class="note" style="margin-top:12px">${decisionText(p)}</div>`;
+  plotData=[{y:a,type:'box',name:v,boxpoints:'outliers'}];
+  plotLayout={title:lang==='fa'?`توزیع ${v}`:`Distribution of ${v}`};
+ }
+ else if(t==='ttest_ind'){
+  let v=$('testVarNumeric1').value,g=$('testVarGroup').value,l1=$('testGroup1').value,l2=$('testGroup2').value;
+  if(!l1||!l2||l1===l2){$('testResult').innerHTML=`<div class="note">${T.errNeedTwoLevels}</div>`;Plotly.purge('testPlot');return}
+  let g1=data.filter(r=>String(r[g])===l1&&num(r[v])).map(r=>+r[v]);
+  let g2=data.filter(r=>String(r[g])===l2&&num(r[v])).map(r=>+r[v]);
+  if(g1.length<2||g2.length<2){$('testResult').innerHTML=`<div class="note">${T.errNotEnoughData}</div>`;Plotly.purge('testPlot');return}
+  let n1=g1.length,n2=g2.length,m1=mean(g1),m2=mean(g2),s1=sd(g1),s2=sd(g2);
+  let sp2=((n1-1)*s1*s1+(n2-1)*s2*s2)/(n1+n2-2),seP=Math.sqrt(sp2*(1/n1+1/n2)),dfP=n1+n2-2,tP=(m1-m2)/seP,pP=tTwoTailP(Math.abs(tP),dfP);
+  let seW=Math.sqrt(s1*s1/n1+s2*s2/n2),dfW=Math.pow(s1*s1/n1+s2*s2/n2,2)/((Math.pow(s1*s1/n1,2)/(n1-1))+(Math.pow(s2*s2/n2,2)/(n2-1))),tW=(m1-m2)/seW,pW=tTwoTailP(Math.abs(tW),dfW);
+  let cohend=(m1-m2)/Math.sqrt(sp2);
+  let md1=median(g1),md2=median(g2),dev1=g1.map(x=>Math.abs(x-md1)),dev2=g2.map(x=>Math.abs(x-md2));
+  let lev=oneWayF([dev1,dev2]),pLev=fUpperP(lev.F,lev.dfb,lev.dfw);
+  resultHtml=hyp(T.h0Ind,T.h1Ind)+
+   `<table style="margin-top:12px"><tr><th></th><th>n</th><th>Mean</th><th>SD</th></tr><tr><td>${l1}</td><td>${n1}</td><td>${fmt(m1)}</td><td>${fmt(s1)}</td></tr><tr><td>${l2}</td><td>${n2}</td><td>${fmt(m2)}</td><td>${fmt(s2)}</td></tr></table>`+
+   `<table style="margin-top:12px"><tr><th></th><th>t</th><th>df</th><th>p-value</th></tr><tr><td>Student (equal var.)</td><td>${fmt(tP)}</td><td>${fmt(dfP)}</td><td>${fmt4(pP)}</td></tr><tr><td>Welch (unequal var.)</td><td>${fmt(tW)}</td><td>${fmt(dfW)}</td><td>${fmt4(pW)}</td></tr></table>`+
+   `<div class="note" style="margin-top:12px">Cohen's d = ${fmt(cohend)}<br>${T.levenePrefix}F(${lev.dfb},${lev.dfw})=${fmt(lev.F)}, p=${fmt4(pLev)} — ${pLev<0.05?T.leveneFail:T.levenePass}</div>`+
+   `<div class="note" style="margin-top:12px">${decisionText(pW)}</div>`;
+  plotData=[{y:g1,type:'box',name:l1},{y:g2,type:'box',name:l2}];
+  plotLayout={title:lang==='fa'?`توزیع ${v} به تفکیک ${g}`:`Distribution of ${v} by ${g}`};
+ }
+ else if(t==='ttest_paired'){
+  let v1=$('testVarNumeric1').value,v2=$('testVarNumeric2').value;
+  let pairs=data.filter(r=>num(r[v1])&&num(r[v2]));
+  if(pairs.length<3){$('testResult').innerHTML=`<div class="note">${T.errNotEnoughData}</div>`;Plotly.purge('testPlot');return}
+  let d=pairs.map(r=>+r[v1]-+r[v2]),n=d.length,m=mean(d),s=sd(d),se=s/Math.sqrt(n),df=n-1,tstat=m/se,p=tTwoTailP(Math.abs(tstat),df),cohend=m/s;
+  resultHtml=hyp(T.h0Paired,T.h1Paired)+
+   `<table style="margin-top:12px"><tr><th>n</th><th>Mean(${v1})</th><th>Mean(${v2})</th><th>Mean diff</th><th>SD diff</th></tr><tr><td>${n}</td><td>${fmt(mean(pairs.map(r=>+r[v1])))}</td><td>${fmt(mean(pairs.map(r=>+r[v2])))}</td><td>${fmt(m)}</td><td>${fmt(s)}</td></tr></table>`+
+   `<table style="margin-top:12px"><tr><th>t</th><th>df</th><th>p-value</th><th>Cohen's d</th></tr><tr><td>${fmt(tstat)}</td><td>${df}</td><td>${fmt4(p)}</td><td>${fmt(cohend)}</td></tr></table>`+
+   `<div class="note" style="margin-top:12px">${decisionText(p)}</div>`;
+  plotData=[{y:d,type:'box',name:lang==='fa'?'تفاضل':'Difference'}];
+  plotLayout={title:lang==='fa'?'توزیع تفاضل‌ها':'Distribution of differences'};
+ }
+ else if(t==='anova'){
+  let v=$('testVarNumeric1').value,g=$('testVarGroup').value;
+  let levels=[...new Set(data.map(r=>r[g]).filter(x=>x!==''&&x!=null).map(String))];
+  let groups=levels.map(l=>({l,vals:data.filter(r=>String(r[g])===l&&num(r[v])).map(r=>+r[v])})).filter(gr=>gr.vals.length>=2);
+  if(groups.length<2){$('testResult').innerHTML=`<div class="note">${T.errNeedThreeLevels}</div>`;Plotly.purge('testPlot');return}
+  let stat=oneWayF(groups.map(gr=>gr.vals)),p=fUpperP(stat.F,stat.dfb,stat.dfw),eta2=stat.ssb/(stat.ssb+stat.ssw);
+  let devGroups=groups.map(gr=>{let md=median(gr.vals);return gr.vals.map(x=>Math.abs(x-md))});
+  let lev=oneWayF(devGroups),pLev=fUpperP(lev.F,lev.dfb,lev.dfw);
+  let descRows=groups.map(gr=>`<tr><td>${gr.l}</td><td>${gr.vals.length}</td><td>${fmt(mean(gr.vals))}</td><td>${fmt(sd(gr.vals))}</td></tr>`).join('');
+  let postHocHtml='';
+  if(groups.length<=8){
+   let k=groups.length,nc=k*(k-1)/2,rows=[];
+   for(let i=0;i<k;i++)for(let j=i+1;j<k;j++){
+    let gi=groups[i],gj=groups[j];
+    let seij=Math.sqrt(stat.msw*(1/gi.vals.length+1/gj.vals.length));
+    let tij=(mean(gi.vals)-mean(gj.vals))/seij;
+    let pij=Math.min(1,tTwoTailP(Math.abs(tij),stat.dfw)*nc);
+    rows.push(`<tr><td>${gi.l} – ${gj.l}</td><td>${fmt(mean(gi.vals)-mean(gj.vals))}</td><td>${fmt(tij)}</td><td>${fmt4(pij)}</td></tr>`);
+   }
+   postHocHtml=`<h4 style="margin-top:14px;color:var(--ink);font-size:14px">${T.postHocTitle}</h4><table><tr><th></th><th>${lang==='fa'?'اختلاف میانگین':'Mean diff'}</th><th>t</th><th>p (adj.)</th></tr>${rows.join('')}</table>`;
+  }
+  resultHtml=hyp(T.h0Anova,T.h1Anova)+
+   `<table style="margin-top:12px"><tr><th></th><th>n</th><th>Mean</th><th>SD</th></tr>${descRows}</table>`+
+   `<table style="margin-top:12px"><tr><th>SS(between)</th><th>df(between)</th><th>SS(within)</th><th>df(within)</th><th>F</th><th>p-value</th><th>η²</th></tr><tr><td>${fmt(stat.ssb)}</td><td>${stat.dfb}</td><td>${fmt(stat.ssw)}</td><td>${stat.dfw}</td><td>${fmt(stat.F)}</td><td>${fmt4(p)}</td><td>${fmt(eta2)}</td></tr></table>`+
+   `<div class="note" style="margin-top:12px">${T.levenePrefix}F(${lev.dfb},${lev.dfw})=${fmt(lev.F)}, p=${fmt4(pLev)} — ${pLev<0.05?T.leveneFail:T.levenePass}</div>`+
+   `<div class="note" style="margin-top:12px">${decisionText(p)}</div>`+postHocHtml;
+  plotData=groups.map(gr=>({y:gr.vals,type:'box',name:gr.l}));
+  plotLayout={title:lang==='fa'?`توزیع ${v} به تفکیک ${g}`:`Distribution of ${v} by ${g}`};
+ }
+ else if(t==='chisq'){
+  let g1=$('testVarGroup').value,g2=$('testCatVar2').value;
+  let rowsL=[...new Set(data.map(r=>r[g1]).filter(x=>x!==''&&x!=null).map(String))];
+  let colsL=[...new Set(data.map(r=>r[g2]).filter(x=>x!==''&&x!=null).map(String))];
+  if(rowsL.length<2||colsL.length<2){$('testResult').innerHTML=`<div class="note">${T.errNeedTwoLevels}</div>`;Plotly.purge('testPlot');return}
+  let valid=data.filter(r=>r[g1]!==''&&r[g1]!=null&&r[g2]!==''&&r[g2]!=null);
+  let O=rowsL.map(rl=>colsL.map(cl=>valid.filter(r=>String(r[g1])===rl&&String(r[g2])===cl).length));
+  let rowT=O.map(row=>row.reduce((s,x)=>s+x,0)),colT=colsL.map((_,j)=>O.reduce((s,row)=>s+row[j],0)),grand=valid.length;
+  let E=rowsL.map((_,i)=>colsL.map((_,j)=>rowT[i]*colT[j]/grand));
+  let chi2=0,anyLow=false;
+  for(let i=0;i<rowsL.length;i++)for(let j=0;j<colsL.length;j++){chi2+=Math.pow(O[i][j]-E[i][j],2)/E[i][j];if(E[i][j]<5)anyLow=true}
+  let df=(rowsL.length-1)*(colsL.length-1),p=chisqUpperP(chi2,df),cramV=Math.sqrt(chi2/(grand*(Math.min(rowsL.length,colsL.length)-1)));
+  let tableRows=O.map((row,i)=>`<tr><td>${rowsL[i]}</td>${row.map(v=>`<td>${v}</td>`).join('')}</tr>`).join('');
+  resultHtml=hyp(T.h0Chisq,T.h1Chisq)+
+   `<table style="margin-top:12px"><tr><th></th>${colsL.map(c=>`<th>${c}</th>`).join('')}</tr>${tableRows}</table>`+
+   `<table style="margin-top:12px"><tr><th>χ²</th><th>df</th><th>p-value</th><th>Cramér's V</th></tr><tr><td>${fmt(chi2)}</td><td>${df}</td><td>${fmt4(p)}</td><td>${fmt(cramV)}</td></tr></table>`+
+   (anyLow?`<div class="note" style="margin-top:12px">${T.cellWarn}</div>`:'')+
+   `<div class="note" style="margin-top:12px">${decisionText(p)}</div>`;
+  plotData=colsL.map((cl,j)=>({x:rowsL,y:O.map(row=>row[j]),name:cl,type:'bar'}));
+  plotLayout={title:lang==='fa'?`فراوانی مشترک ${g1} و ${g2}`:`Joint frequency of ${g1} and ${g2}`,barmode:'group'};
+ }
+ else if(t==='pearson'||t==='spearman'){
+  let v1=$('testVarNumeric1').value,v2=$('testVarNumeric2').value;
+  let pairs=data.filter(r=>num(r[v1])&&num(r[v2]));
+  if(pairs.length<4){$('testResult').innerHTML=`<div class="note">${T.errNotEnoughData}</div>`;Plotly.purge('testPlot');return}
+  let x=pairs.map(r=>+r[v1]),y=pairs.map(r=>+r[v2]),n=pairs.length,df=n-2;
+  let rSpear=null,rStat;
+  if(t==='pearson'){ rStat=pearsonR(x,y); } else { rStat=pearsonR(rankArray(x),rankArray(y)); }
+  let tstat=rStat*Math.sqrt(df/(1-rStat*rStat)),p=tTwoTailP(Math.abs(tstat),df);
+  let ciHtml='';
+  if(t==='pearson'){
+   let z=Math.atanh(Math.max(-0.999999,Math.min(0.999999,rStat))),sez=1/Math.sqrt(n-3);
+   let ciLow=Math.tanh(z-1.96*sez),ciHigh=Math.tanh(z+1.96*sez);
+   ciHtml=`<th>95% CI</th>`; var ciCell=`<td>[${fmt(ciLow)}, ${fmt(ciHigh)}]</td>`;
+  } else { ciHtml=''; var ciCell=''; }
+  resultHtml=hyp(T.h0Corr,T.h1Corr)+
+   `<table style="margin-top:12px"><tr><th>${t==='pearson'?'r':'ρ'}</th><th>n</th><th>df</th><th>t</th><th>p-value</th>${ciHtml}</tr><tr><td>${fmt(rStat)}</td><td>${n}</td><td>${df}</td><td>${fmt(tstat)}</td><td>${fmt4(p)}</td>${ciCell}</tr></table>`+
+   `<div class="note" style="margin-top:12px">${decisionText(p)}</div>`;
+  let mx=mean(x),my=mean(y),slope=x.reduce((s,v,i)=>s+(v-mx)*(y[i]-my),0)/x.reduce((s,v)=>s+(v-mx)**2,0),intercept=my-slope*mx;
+  let xr=[Math.min(...x),Math.max(...x)];
+  plotData=t==='pearson'
+   ?[{x,y,mode:'markers',type:'scatter',name:lang==='fa'?'داده':'Data'},{x:xr,y:xr.map(xx=>intercept+slope*xx),mode:'lines',name:lang==='fa'?'خط برازش':'Fit line'}]
+   :[{x,y,mode:'markers',type:'scatter',name:lang==='fa'?'داده':'Data'}];
+  plotLayout={title:`${v1} ${lang==='fa'?'در برابر':'vs'} ${v2} (${t==='pearson'?'r':'ρ'}=${fmt(rStat)})`,xaxis:{title:v1},yaxis:{title:v2}};
+ }
+ $('testResult').innerHTML=resultHtml;
+ if(plotData) Plotly.newPlot('testPlot',plotData,plotLayout); else Plotly.purge('testPlot');
+}
+
+function dropColumn(){let h=$('columnSelect').value;let msg=lang==='fa'?`ستون ${h} حذف شود؟`:`Remove column "${h}"?`;if(!confirm(msg))return;headers=headers.filter(x=>x!==h);data.forEach(r=>delete r[h]);refresh()}
+function dropMissingRows(){if($('dropMissing').value!=='all')return;data=data.filter(r=>headers.every(h=>r[h]!==''&&r[h]!=null));refresh()}
+function resetAll(){let msg=lang==='fa'?'تمام داده حذف شود؟':'Clear all data?';if(confirm(msg)){data=[];headers=[];$('app').classList.add('hidden');$('fileNameText').textContent=L[lang].noData}}
+function downloadCSV(){let csv=Papa.unparse(data);let a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='statmine_processed.csv';a.click()}
+
+/* ===================== ML / Statistical modeling engine ===================== */
+function shuffle(a){for(let i=a.length-1;i>0;i--){let j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a}
+function transpose(A){return A[0].map((_,i)=>A.map(r=>r[i]))}
+function matMul(A,B){let r=A.length,c=B[0].length,n=B.length,out=Array.from({length:r},()=>Array(c).fill(0));for(let i=0;i<r;i++)for(let k=0;k<n;k++){let a=A[i][k];if(a===0)continue;for(let j=0;j<c;j++)out[i][j]+=a*B[k][j];}return out}
+function matVec(A,v){return A.map(row=>row.reduce((s,a,j)=>s+a*v[j],0))}
+function inverse(A){let n=A.length,M=A.map((row,i)=>[...row,...Array.from({length:n},(_,j)=>i===j?1:0)]);
+ for(let i=0;i<n;i++){let piv=i;for(let k=i+1;k<n;k++)if(Math.abs(M[k][i])>Math.abs(M[piv][i]))piv=k;[M[i],M[piv]]=[M[piv],M[i]];
+  let div=M[i][i];if(Math.abs(div)<1e-9)div=1e-9;for(let j=0;j<2*n;j++)M[i][j]/=div;
+  for(let k=0;k<n;k++){if(k===i)continue;let f=M[k][i];for(let j=0;j<2*n;j++)M[k][j]-=f*M[i][j];}}
+ return M.map(row=>row.slice(n));}
+function erf(x){let s=x<0?-1:1;x=Math.abs(x);let a1=.254829592,a2=-.284496736,a3=1.421413741,a4=-1.453152027,a5=1.061405429,p=.3275911;let t=1/(1+p*x);let y=1-((((a5*t+a4)*t+a3)*t+a2)*t+a1)*t*Math.exp(-x*x);return s*y}
+function normCDF(z){return 0.5*(1+erf(z/Math.SQRT2))}
+function sigmoid(z){return 1/(1+Math.exp(-Math.max(-30,Math.min(30,z))))}
+function linRegFit(Xi,y){let ridge=1e-6,Xt=transpose(Xi),XtX=matMul(Xt,Xi);for(let i=0;i<XtX.length;i++)XtX[i][i]+=ridge;let XtXinv=inverse(XtX);let Xty=Xt.map(row=>row.reduce((s,v,i)=>s+v*y[i],0));return {beta:matVec(XtXinv,Xty),XtXinv}}
+function logRegFit(Xi,y,iters=800,lr=.3,l2=1e-3){let n=Xi.length,p=Xi[0].length,w=Array(p).fill(0);
+ for(let it=0;it<iters;it++){let grad=Array(p).fill(0);for(let i=0;i<n;i++){let z=Xi[i].reduce((s,x,j)=>s+x*w[j],0);let err=sigmoid(z)-y[i];for(let j=0;j<p;j++)grad[j]+=err*Xi[i][j];}for(let j=0;j<p;j++)w[j]-=lr*(grad[j]/n+l2*w[j]);}
+ return w}
+function knnPredict(trainX,trainY,testX,k,isClass){return testX.map(tx=>{let d=trainX.map((row,i)=>({d:Math.sqrt(row.reduce((s,v,j)=>s+(v-tx[j])**2,0)),y:trainY[i]}));d.sort((a,b)=>a.d-b.d);let nn=d.slice(0,Math.min(k,d.length));
+ if(isClass){let c={};nn.forEach(x=>c[x.y]=(c[x.y]||0)+1);return +Object.entries(c).sort((a,b)=>b[1]-a[1])[0][0]}
+ return nn.reduce((s,x)=>s+x.y,0)/nn.length})}
+function mseImp(ys){let m=ys.reduce((s,v)=>s+v,0)/ys.length;return ys.reduce((s,v)=>s+(v-m)**2,0)/ys.length}
+function giniImp(ys){let c={};ys.forEach(v=>c[v]=(c[v]||0)+1);let n=ys.length;return 1-Object.values(c).reduce((s,x)=>s+(x/n)**2,0)}
+function majority(ys){let c={};ys.forEach(v=>c[v]=(c[v]||0)+1);return +Object.entries(c).sort((a,b)=>b[1]-a[1])[0][0]}
+function buildTree(X,y,depth,maxDepth,minLeaf,isClass){
+ if(depth>=maxDepth||X.length<2*minLeaf||new Set(y).size===1)return {leaf:true,value:isClass?majority(y):y.reduce((s,v)=>s+v,0)/y.length};
+ let nFeat=X[0].length,best=null;
+ for(let f=0;f<nFeat;f++){
+  let raw=[...new Set(X.map(r=>r[f]))].sort((a,b)=>a-b);
+  let vals=raw.length>40?Array.from({length:40},(_,i)=>raw[Math.floor(i*(raw.length-1)/39)]):raw;
+  for(let vi=0;vi<vals.length-1;vi++){
+   let thr=(vals[vi]+vals[vi+1])/2,leftY=[],rightY=[];
+   X.forEach((r,i)=>{(r[f]<=thr?leftY:rightY).push(y[i])});
+   if(leftY.length<minLeaf||rightY.length<minLeaf)continue;
+   let imp=isClass?(leftY.length*giniImp(leftY)+rightY.length*giniImp(rightY))/y.length:(leftY.length*mseImp(leftY)+rightY.length*mseImp(rightY))/y.length;
+   if(!best||imp<best.imp)best={f,thr,imp};
+  }
+ }
+ if(!best)return {leaf:true,value:isClass?majority(y):y.reduce((s,v)=>s+v,0)/y.length};
+ let li=[],ri=[];X.forEach((r,i)=>{(r[best.f]<=best.thr?li:ri).push(i)});
+ return {leaf:false,f:best.f,thr:best.thr,
+  left:buildTree(li.map(i=>X[i]),li.map(i=>y[i]),depth+1,maxDepth,minLeaf,isClass),
+  right:buildTree(ri.map(i=>X[i]),ri.map(i=>y[i]),depth+1,maxDepth,minLeaf,isClass)};
+}
+function treePredictOne(node,row){while(!node.leaf)node=row[node.f]<=node.thr?node.left:node.right;return node.value}
+function regMetrics(yt,pred){let m=yt.reduce((s,v)=>s+v,0)/yt.length;let sse=yt.reduce((s,v,i)=>s+(v-pred[i])**2,0);let sst=yt.reduce((s,v)=>s+(v-m)**2,0)||1e-9;return {r2:1-sse/sst,rmse:Math.sqrt(sse/yt.length),mae:yt.reduce((s,v,i)=>s+Math.abs(v-pred[i]),0)/yt.length}}
+function classMetrics(yt,pred,nc){let correct=yt.reduce((s,v,i)=>s+(v===pred[i]?1:0),0);let cm=Array.from({length:nc},()=>Array(nc).fill(0));yt.forEach((v,i)=>cm[v][pred[i]]++);return {acc:correct/yt.length,cm}}
+
+const MODEL_NAMES={
+ fa:{linreg:'رگرسیون خطی چندگانه',knnreg:k=>`KNN رگرسیونی (k=${k})`,tree:'درخت تصمیم',logreg:'رگرسیون لجستیک',knncls:k=>`KNN طبقه‌بندی (k=${k})`},
+ en:{linreg:'Multiple Linear Regression',knnreg:k=>`KNN Regression (k=${k})`,tree:'Decision Tree',logreg:'Logistic Regression',knncls:k=>`KNN Classification (k=${k})`}
+};
+function colName(columns,i){if(i===0)return lang==='fa'?'عرض از مبدأ':'Intercept';let c=columns[i-1];return c.type==='num'?c.feature:`${c.feature}=${c.category}`}
+
+function runML(){
+ let target=$('mlTarget').value;
+ let features=[...$('mlFeatures').selectedOptions].map(o=>o.value).filter(f=>f!==target);
+ if(!target||features.length===0){alert(lang==='fa'?'لطفاً متغیر هدف و حداقل یک ویژگی پیش‌بین را انتخاب کنید.':'Please select a target variable and at least one predictor feature.');return}
+ let taskSel=$('mlTaskType').value;
+ let isRegression=taskSel==='auto'?numericVars.includes(target):taskSel==='regression';
+ let rows=data.filter(r=>r[target]!==''&&r[target]!=null&&features.every(f=>r[f]!==''&&r[f]!=null));
+ if(rows.length<20){$('mlTaskInfo').classList.remove('hidden');$('mlTaskInfo').innerHTML=lang==='fa'?'داده معتبر کافی برای مدل‌سازی وجود ندارد (حداقل ۲۰ مشاهده کامل لازم است).':'Not enough valid data for modeling (at least 20 complete observations are required).';$('mlCompare').innerHTML='';$('mlDetail').innerHTML='';return}
+ let catInfo={};features.forEach(f=>{if(!numericVars.includes(f))catInfo[f]=[...new Set(rows.map(r=>String(r[f])))]});
+ let columns=[];features.forEach(f=>{if(numericVars.includes(f))columns.push({feature:f,type:'num'});else catInfo[f].forEach(c=>columns.push({feature:f,type:'onehot',category:c}))});
+ let rawX=rows.map(r=>{let v=[];features.forEach(f=>{if(numericVars.includes(f))v.push(Number(r[f]));else catInfo[f].forEach(c=>v.push(String(r[f])===c?1:0))});return v});
+ let X=rawX.map(r=>[...r]);
+ columns.forEach((c,i)=>{if(c.type==='num'){let cv=rawX.map(r=>r[i]);let m=mean(cv),s=sd(cv)||1;X.forEach(r=>r[i]=(r[i]-m)/s)}});
+ let Xi=X.map(r=>[1,...r]);
+ let classes=[],y;
+ if(isRegression){y=rows.map(r=>Number(r[target]))}
+ else {classes=[...new Set(rows.map(r=>String(r[target])))];y=rows.map(r=>classes.indexOf(String(r[target])))}
+ let n=rows.length,idxArr=shuffle([...Array(n).keys()]),splitRatio=Number($('mlSplit').value);
+ let nTest=Math.max(5,Math.round(n*splitRatio)),testIdx=idxArr.slice(0,nTest),trainIdx=idxArr.slice(nTest);
+ let trainX=trainIdx.map(i=>X[i]),testX=testIdx.map(i=>X[i]),trainXi=trainIdx.map(i=>Xi[i]),testXi=testIdx.map(i=>Xi[i]);
+ let trainY=trainIdx.map(i=>y[i]),testY=testIdx.map(i=>y[i]);
+ $('mlTaskInfo').classList.remove('hidden');
+ $('mlTaskInfo').innerHTML = lang==='fa'
+  ?`نوع مسئله: <b>${isRegression?'رگرسیون (پیش‌بینی مقدار عددی)':'طبقه‌بندی (پیش‌بینی '+classes.length+' رده: '+classes.join('، ')+')'}</b><br>مشاهدات معتبر: ${n} — آموزش: ${trainX.length} — آزمون: ${testX.length} — ستون ورودی پس از کدگذاری متغیرهای کیفی: ${columns.length}`
+  :`Problem type: <b>${isRegression?'Regression (predicting a numeric value)':'Classification (predicting '+classes.length+' classes: '+classes.join(', ')+')'}</b><br>Valid observations: ${n} — Train: ${trainX.length} — Test: ${testX.length} — Input columns after encoding categorical variables: ${columns.length}`;
+ let results=[],detailHtml='',plotData=null,plotLayout=null;
+ if(isRegression){
+  let {beta,XtXinv}=linRegFit(trainXi,trainY);
+  let predTrain=trainXi.map(r=>r.reduce((s,v,i)=>s+v*beta[i],0));
+  let predTest=testXi.map(r=>r.reduce((s,v,i)=>s+v*beta[i],0));
+  let m1=regMetrics(testY,predTest);
+  results.push({name:MODEL_NAMES[lang].linreg,r2:m1.r2,rmse:m1.rmse,mae:m1.mae,pred:predTest});
+  let resid=trainY.map((v,i)=>v-predTrain[i]),p=beta.length,ntr=trainY.length;
+  let sigma2=resid.reduce((s,v)=>s+v*v,0)/Math.max(1,ntr-p);
+  let coefHdr=lang==='fa'?['متغیر','ضریب','خطای معیار','t','p-value']:['Variable','Coefficient','Std. Error','t','p-value'];
+  let coefRows=beta.map((b,i)=>{let se=Math.sqrt(Math.max(sigma2*XtXinv[i][i],0));let t=se?b/se:0;let pv=2*(1-normCDF(Math.abs(t)));return `<tr><td>${colName(columns,i)}</td><td>${fmt(b)}</td><td>${fmt(se)}</td><td>${fmt(t)}</td><td>${fmt(pv)}</td></tr>`}).join('');
+  let coefTitle=lang==='fa'?'ضرایب رگرسیون خطی (ویژگی‌های عددی استانداردسازی z-score شده‌اند؛ p-value تقریب نرمال است)':'Linear Regression Coefficients (numeric features are z-score standardized; p-values use a normal approximation)';
+  detailHtml+=`<h4>${coefTitle}</h4><table><tr>${coefHdr.map(h=>`<th>${h}</th>`).join('')}</tr>${coefRows}</table>`;
+  let k=Math.max(1,Number($('mlK').value)||5);
+  let predKnn=knnPredict(trainX,trainY,testX,k,false),m2=regMetrics(testY,predKnn);
+  results.push({name:MODEL_NAMES[lang].knnreg(k),r2:m2.r2,rmse:m2.rmse,mae:m2.mae,pred:predKnn});
+  let tree=buildTree(trainX,trainY,0,6,5,false),predTree=testX.map(r=>treePredictOne(tree,r)),m3=regMetrics(testY,predTree);
+  results.push({name:MODEL_NAMES[lang].tree,r2:m3.r2,rmse:m3.rmse,mae:m3.mae,pred:predTree});
+  results.sort((a,b)=>b.r2-a.r2);
+  let cmpTitle=lang==='fa'?'مقایسه مدل‌ها (مرتب بر اساس R² روی داده آزمون)':'Model comparison (sorted by R² on test data)';
+  let cmpHdr=lang==='fa'?['مدل','R²','RMSE','MAE']:['Model','R²','RMSE','MAE'];
+  $('mlCompare').innerHTML=`<h4>${cmpTitle}</h4><table><tr>${cmpHdr.map(h=>`<th>${h}</th>`).join('')}</tr>${results.map(r=>`<tr><td>${r.name}</td><td>${fmt(r.r2)}</td><td>${fmt(r.rmse)}</td><td>${fmt(r.mae)}</td></tr>`).join('')}</table>`;
+  let best=results[0];
+  let legendPred=lang==='fa'?'پیش‌بینی':'Prediction',legendIdeal=lang==='fa'?'خط ایده‌آل (y=x)':'Ideal line (y=x)';
+  plotData=[{x:testY,y:best.pred,mode:'markers',type:'scatter',name:legendPred},{x:[Math.min(...testY),Math.max(...testY)],y:[Math.min(...testY),Math.max(...testY)],mode:'lines',name:legendIdeal,line:{dash:'dot'}}];
+  let plotTitle=lang==='fa'?`مقدار واقعی در برابر پیش‌بینی — بهترین مدل: ${best.name}`:`Actual vs Predicted — Best model: ${best.name}`;
+  plotLayout={title:plotTitle,xaxis:{title:lang==='fa'?'مقدار واقعی':'Actual value'},yaxis:{title:lang==='fa'?'پیش‌بینی':'Predicted'}};
+ } else {
+  let nc=classes.length;
+  if(nc===2){
+   let w=logRegFit(trainXi,trainY);
+   let predTest=testXi.map(r=>sigmoid(r.reduce((s,v,i)=>s+v*w[i],0))>0.5?1:0);
+   let m1=classMetrics(testY,predTest,nc);
+   results.push({name:MODEL_NAMES[lang].logreg,acc:m1.acc,cm:m1.cm,pred:predTest});
+   let coefHdr=lang==='fa'?['متغیر','ضریب (log-odds)','Odds Ratio']:['Variable','Coefficient (log-odds)','Odds Ratio'];
+   let coefRows=w.map((b,i)=>`<tr><td>${colName(columns,i)}</td><td>${fmt(b)}</td><td>${fmt(Math.exp(b))}</td></tr>`).join('');
+   let coefTitle=lang==='fa'?`ضرایب رگرسیون لجستیک (کلاس مرجع: ${classes[0]} / کلاس هدف: ${classes[1]}؛ برازش با گرادیان کاهشی + L2)`:`Logistic Regression Coefficients (reference class: ${classes[0]} / target class: ${classes[1]}; fitted via gradient descent + L2)`;
+   detailHtml+=`<h4>${coefTitle}</h4><table><tr>${coefHdr.map(h=>`<th>${h}</th>`).join('')}</tr>${coefRows}</table>`;
+  } else {
+   detailHtml+=`<div class="note">${lang==='fa'?`رگرسیون لجستیک در این نسخه فقط برای متغیر هدف دو-رده‌ای اجرا می‌شود (متغیر هدف انتخابی ${nc} رده دارد).`:`In this version, logistic regression only runs for a two-class target (the selected target has ${nc} classes).`}</div>`;
+  }
+  let k=Math.max(1,Number($('mlK').value)||5);
+  let predKnn=knnPredict(trainX,trainY,testX,k,true),m2=classMetrics(testY,predKnn,nc);
+  results.push({name:MODEL_NAMES[lang].knncls(k),acc:m2.acc,cm:m2.cm,pred:predKnn});
+  let tree=buildTree(trainX,trainY,0,6,5,true),predTree=testX.map(r=>treePredictOne(tree,r)),m3=classMetrics(testY,predTree,nc);
+  results.push({name:MODEL_NAMES[lang].tree,acc:m3.acc,cm:m3.cm,pred:predTree});
+  results.sort((a,b)=>b.acc-a.acc);
+  let cmpTitle=lang==='fa'?'مقایسه مدل‌ها (مرتب بر اساس دقت روی داده آزمون)':'Model comparison (sorted by accuracy on test data)';
+  let cmpHdr=lang==='fa'?['مدل','دقت']:['Model','Accuracy'];
+  $('mlCompare').innerHTML=`<h4>${cmpTitle}</h4><table><tr>${cmpHdr.map(h=>`<th>${h}</th>`).join('')}</tr>${results.map(r=>`<tr><td>${r.name}</td><td>${fmt(r.acc*100)}%</td></tr>`).join('')}</table>`;
+  let best=results[0];
+  plotData=[{z:best.cm,x:classes,y:classes,type:'heatmap',colorscale:'Blues'}];
+  let plotTitle=lang==='fa'?`ماتریس درهم‌ریختگی — بهترین مدل: ${best.name}`:`Confusion Matrix — Best model: ${best.name}`;
+  plotLayout={title:plotTitle,xaxis:{title:lang==='fa'?'پیش‌بینی':'Predicted'},yaxis:{title:lang==='fa'?'واقعی':'Actual'}};
+ }
+ $('mlDetail').innerHTML=detailHtml;
+ Plotly.newPlot('mlPlot',plotData,plotLayout);
+}
+
+if('serviceWorker' in navigator){
+ window.addEventListener('load',()=>{navigator.serviceWorker.register('sw.js').catch(()=>{})});
+}
+</script></body></html>
