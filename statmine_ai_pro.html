@@ -89,7 +89,7 @@ footer{max-width:1200px;margin:10px auto 40px;padding:18px 20px 0;border-top:1px
 
 <section id="stats" class="panel hidden"><div class="card"><h3 data-i18n="statsTitle"></h3><label><span data-i18n="labelVars"></span><select id="statVars" multiple size="8"></select></label><br><br><button class="primary" onclick="selectedStats()" data-i18n="calcBtn"></button><div id="statsResult" style="margin-top:15px"></div></div></section>
 
-<section id="charts" class="panel hidden"><div class="card"><div class="grid"><div><label><span data-i18n="labelChartType"></span><select id="chartType"><option value="histogram" data-i18n="chartHistogram"></option><option value="box" data-i18n="chartBox"></option><option value="scatter" data-i18n="chartScatter"></option><option value="bar" data-i18n="chartBar"></option></select></label></div><div><label><span data-i18n="labelVar1"></span><select id="xVar"></select></label></div><div><label><span data-i18n="labelVar2"></span><select id="yVar"></select></label></div></div><br><button class="primary" onclick="drawChart()" data-i18n="drawBtn"></button><div id="plot"></div></div></section>
+<section id="charts" class="panel hidden"><div class="card"><div class="grid"><div><label><span data-i18n="labelChartType"></span><select id="chartType" onchange="onChartTypeChange()"><option value="histogram" data-i18n="chartHistogram"></option><option value="box" data-i18n="chartBox"></option><option value="bar" data-i18n="chartBar"></option><option value="pie" data-i18n="chartPie"></option><option value="scatter" data-i18n="chartScatter"></option><option value="line" data-i18n="chartLine"></option><option value="area" data-i18n="chartArea"></option><option value="timeseries" data-i18n="chartTimeSeries"></option><option value="groupedbar" data-i18n="chartGroupedBar"></option></select></label></div><div id="xVarWrap"><label><span id="xVarLabel" data-i18n="labelVar1"></span><select id="xVar"></select></label></div><div id="yVarWrap"><label><span data-i18n="labelVar2"></span><select id="yVar"></select></label></div></div><p id="chartHint" style="font-size:12.5px;color:var(--text-soft);margin-top:8px"></p><br><button class="primary" onclick="drawChart()" data-i18n="drawBtn"></button><div id="plot"></div></div></section>
 
 <section id="analysis" class="panel hidden"><div class="card"><h3 data-i18n="analysisAssistantTitle"></h3><div class="grid"><div><label><span data-i18n="labelGoal"></span><select id="goal"><option value="compare" data-i18n="goalCompare"></option><option value="relation" data-i18n="goalRelation"></option><option value="predict" data-i18n="goalPredict"></option></select></label></div><div><label><span data-i18n="labelResponseType"></span><select id="response"><option value="numeric" data-i18n="respNumeric"></option><option value="categorical" data-i18n="respCategorical"></option></select></label></div><div><label><span data-i18n="labelGroups"></span><select id="groups"><option value="2" data-i18n="groups2"></option><option value="3" data-i18n="groups3"></option></select></label></div></div><br><button class="primary" onclick="advise()" data-i18n="adviseBtn"></button><div id="advice" class="note" style="margin-top:14px"></div></div>
 
@@ -174,7 +174,17 @@ const L={
   smartReportTitle:'گزارش هوشمند اولیه',
   exploreTitle:'انتخاب و فیلتر متغیر', labelVariable:'متغیر', labelFilterType:'نوع فیلتر', filterNone:'بدون فیلتر', filterMissing:'فقط داده گمشده', filterNotMissing:'فقط داده معتبر', showBtn:'نمایش',
   statsTitle:'آمار توصیفی انتخابی', labelVars:'متغیرهای موردنظر', calcBtn:'محاسبه',
-  labelChartType:'نوع نمودار', chartHistogram:'هیستوگرام', chartBox:'باکس پلات', chartScatter:'نمودار پراکنش', chartBar:'نمودار ستونی', labelVar1:'متغیر اول', labelVar2:'متغیر دوم', drawBtn:'رسم نمودار',
+  labelChartType:'نوع نمودار', chartHistogram:'هیستوگرام', chartBox:'باکس پلات', chartScatter:'نمودار پراکنش', chartBar:'نمودار ستونی', chartPie:'نمودار دایره‌ای', chartLine:'نمودار خطی', chartArea:'نمودار سطحی', chartTimeSeries:'سری زمانی', chartGroupedBar:'ستونی گروهی (دو متغیر کیفی)', labelVar1:'متغیر اول', labelVar2:'متغیر دوم', labelDateVar:'متغیر زمانی / تاریخ', drawBtn:'رسم نمودار',
+  hintHistogram:'هیستوگرام شکل توزیع یک متغیر عددی (متغیر اول) را نشان می‌دهد.',
+  hintBox:'باکس‌پلات میانه، پراکندگی و داده‌های پرت یک متغیر عددی (متغیر اول) را نشان می‌دهد.',
+  hintBar:'فراوانی سطوح یک متغیر کیفی (متغیر اول) را نشان می‌دهد.',
+  hintPie:'سهم هر سطح از یک متغیر کیفی (متغیر اول) را به‌صورت درصدی نشان می‌دهد.',
+  hintScatter:'رابطه بین دو متغیر عددی (متغیر اول و دوم) را نشان می‌دهد.',
+  hintLine:'متغیر دوم (عددی) را بر حسب متغیر اول (به ترتیب صعودی) به‌صورت خط رسم می‌کند؛ مناسب برای روند.',
+  hintArea:'مانند نمودار خطی، با ناحیه پرشده زیر خط؛ برای نمایش تجمعی یا حجم روند مناسب است.',
+  hintTimeSeries:'متغیر اول باید تاریخ/زمان باشد (مثلاً 2024-01-15)؛ داده به‌ترتیب زمانی مرتب و متغیر دوم (عددی) به‌صورت روند زمانی رسم می‌شود.',
+  hintGroupedBar:'فراوانی مشترک دو متغیر کیفی (اول و دوم) را به‌صورت ستون‌های گروه‌بندی‌شده نشان می‌دهد.',
+  errNoValidDates:'هیچ مقدار معتبری برای تبدیل به تاریخ در متغیر اول یافت نشد. لطفاً متغیری با فرمت تاریخ (مانند YYYY-MM-DD) انتخاب کنید.',
   analysisAssistantTitle:'دستیار انتخاب تحلیل', labelGoal:'هدف', goalCompare:'مقایسه', goalRelation:'رابطه', goalPredict:'پیش‌بینی', labelResponseType:'نوع پاسخ', respNumeric:'کمی', respCategorical:'کیفی', labelGroups:'تعداد گروه', groups2:'دو گروه', groups3:'سه گروه یا بیشتر', adviseBtn:'پیشنهاد تحلیل',
   corrTitle:'ماتریس همبستگی', corrBtn:'محاسبه و رسم',
   testRunnerTitle:'اجرای آزمون آماری', testRunnerNote:'متغیرها و آزمون موردنظر را انتخاب کنید تا آماره، درجه آزادی، p-value و اندازه اثر محاسبه شود.',
@@ -248,7 +258,17 @@ const L={
   smartReportTitle:'Initial Smart Report',
   exploreTitle:'Select & Filter Variable', labelVariable:'Variable', labelFilterType:'Filter type', filterNone:'No filter', filterMissing:'Missing values only', filterNotMissing:'Valid values only', showBtn:'Show',
   statsTitle:'Selected Descriptive Statistics', labelVars:'Variables of interest', calcBtn:'Calculate',
-  labelChartType:'Chart type', chartHistogram:'Histogram', chartBox:'Box plot', chartScatter:'Scatter plot', chartBar:'Bar chart', labelVar1:'Variable 1', labelVar2:'Variable 2', drawBtn:'Draw chart',
+  labelChartType:'Chart type', chartHistogram:'Histogram', chartBox:'Box plot', chartScatter:'Scatter plot', chartBar:'Bar chart', chartPie:'Pie chart', chartLine:'Line chart', chartArea:'Area chart', chartTimeSeries:'Time series', chartGroupedBar:'Grouped bar (two categorical variables)', labelVar1:'Variable 1', labelVar2:'Variable 2', labelDateVar:'Date/time variable', drawBtn:'Draw chart',
+  hintHistogram:'A histogram shows the distribution shape of a numeric variable (Variable 1).',
+  hintBox:'A box plot shows the median, spread, and outliers of a numeric variable (Variable 1).',
+  hintBar:'Shows the frequency of the levels of a categorical variable (Variable 1).',
+  hintPie:'Shows each level\'s share of a categorical variable (Variable 1) as a percentage.',
+  hintScatter:'Shows the relationship between two numeric variables (Variable 1 and 2).',
+  hintLine:'Plots Variable 2 (numeric) against Variable 1 (sorted ascending) as a line; good for trends.',
+  hintArea:'Like a line chart, with the area under the line filled; good for showing cumulative or volume trends.',
+  hintTimeSeries:'Variable 1 must be a date/time (e.g. 2024-01-15); data is sorted chronologically and Variable 2 (numeric) is plotted as a trend over time.',
+  hintGroupedBar:'Shows the joint frequency of two categorical variables (1 and 2) as grouped bars.',
+  errNoValidDates:'No values in Variable 1 could be parsed as dates. Please choose a variable in a date format (e.g. YYYY-MM-DD).',
   analysisAssistantTitle:'Analysis Selection Assistant', labelGoal:'Goal', goalCompare:'Compare', goalRelation:'Relationship', goalPredict:'Predict', labelResponseType:'Response type', respNumeric:'Numeric', respCategorical:'Categorical', labelGroups:'Number of groups', groups2:'Two groups', groups3:'Three groups or more', adviseBtn:'Suggest analysis',
   corrTitle:'Correlation Matrix', corrBtn:'Compute & plot',
   testRunnerTitle:'Run a Statistical Test', testRunnerNote:'Choose the variables and test you need; the test statistic, degrees of freedom, p-value, and effect size are computed for you.',
@@ -323,13 +343,13 @@ function applyI18n(){
  if(!data.length)$('fileNameText').textContent=L[lang].noData;
 }
 function setLang(l){
- lang=l; applyI18n();
+ lang=l; applyI18n(); onChartTypeChange();
  ['exploreResult','statsResult','advice','corr','mlTaskInfo','mlCompare','mlDetail','testResult'].forEach(id=>{if($(id))$(id).innerHTML=''});
  if($('mlTaskInfo'))$('mlTaskInfo').classList.add('hidden');
  try{Plotly.purge('plot')}catch(e){} try{Plotly.purge('mlPlot')}catch(e){} try{Plotly.purge('testPlot')}catch(e){}
  if(data.length)refresh();
 }
-applyI18n();
+applyI18n(); onChartTypeChange();
 
 /* ===================== core app ===================== */
 $('file').onchange=e=>{let f=e.target.files[0];if(!f)return;$('fileNameText').textContent=f.name;Papa.parse(f,{header:true,skipEmptyLines:true,complete:r=>{headers=r.meta.fields;data=r.data;refresh()}})};
@@ -344,7 +364,7 @@ function refresh(){
  let numOptions=numericVars.map(h=>`<option value="${h}">${h}</option>`).join('');
  $('testVarNumeric1').innerHTML=numOptions; $('testVarNumeric2').innerHTML=numOptions;
  $('testVarGroup').innerHTML=options; $('testCatVar2').innerHTML=options;
- populateGroupLevels(); onTestTypeChange();
+ populateGroupLevels(); onTestTypeChange(); onChartTypeChange();
  $('smartReport').innerHTML = lang==='fa'
   ? `داده شما شامل <b>${data.length}</b> مشاهده و <b>${headers.length}</b> متغیر است. تعداد مقادیر گمشده <b>${miss}</b> است. <b>${numericVars.length}</b> متغیر عددی شناسایی شد. برای تحلیل دقیق‌تر، متغیرهای موردنظر و هدف پژوهش را در بخش تحلیل انتخاب کنید.`
   : `Your data contains <b>${data.length}</b> observations and <b>${headers.length}</b> variables. There are <b>${miss}</b> missing values. <b>${numericVars.length}</b> numeric variables were detected. For deeper analysis, choose your variables and research goal in the Analysis tab.`;
@@ -359,12 +379,56 @@ function selectedStats(){let hs=[...$('statVars').selectedOptions].map(o=>o.valu
  let hdrs=lang==='fa'?['متغیر','n','میانگین','SD','حداقل','حداکثر']:['Variable','n','Mean','SD','Min','Max'];
  let t='<table><tr>'+hdrs.map(h=>`<th>${h}</th>`).join('')+'</tr>';
  hs.forEach(h=>{let a=vals(h);if(a.length)t+=`<tr><td>${h}</td><td>${a.length}</td><td>${fmt(mean(a))}</td><td>${fmt(sd(a))}</td><td>${fmt(Math.min(...a))}</td><td>${fmt(Math.max(...a))}</td></tr>`});$('statsResult').innerHTML=t+'</table>'}
-function drawChart(){let type=$('chartType').value,x=$('xVar').value,y=$('yVar').value;
- const T=lang==='fa'?{vs:'در برابر',hist:'هیستوگرام',box:'باکس پلات',freq:'فراوانی'}:{vs:'vs',hist:'Histogram of',box:'Box plot of',freq:'Frequency of'};
- if(type==='scatter'){let a=data.filter(r=>num(r[x])&&num(r[y]));Plotly.newPlot('plot',[{x:a.map(r=>+r[x]),y:a.map(r=>+r[y]),mode:'markers',type:'scatter'}],{title:`${x} ${T.vs} ${y}`});}
- else if(type==='histogram')Plotly.newPlot('plot',[{x:vals(x),type:'histogram'}],{title:`${T.hist} ${x}`});
- else if(type==='box')Plotly.newPlot('plot',[{y:vals(x),type:'box',name:x}],{title:`${T.box} ${x}`});
- else {let counts={};data.forEach(r=>counts[r[x]]=(counts[r[x]]||0)+1);Plotly.newPlot('plot',[{x:Object.keys(counts),y:Object.values(counts),type:'bar'}],{title:`${T.freq} ${x}`});}}
+function onChartTypeChange(){
+ let t=$('chartType').value, T=L[lang];
+ const needsY=['scatter','line','area','timeseries','groupedbar'].includes(t);
+ $('yVarWrap').classList.toggle('hidden', !needsY);
+ $('xVarLabel').textContent = t==='timeseries' ? T.labelDateVar : T.labelVar1;
+ const hintMap={histogram:'hintHistogram',box:'hintBox',bar:'hintBar',pie:'hintPie',scatter:'hintScatter',line:'hintLine',area:'hintArea',timeseries:'hintTimeSeries',groupedbar:'hintGroupedBar'};
+ $('chartHint').textContent = T[hintMap[t]] || '';
+}
+function drawChart(){
+ let type=$('chartType').value,x=$('xVar').value,y=$('yVar').value;
+ const T=lang==='fa'?{vs:'در برابر',hist:'هیستوگرام',box:'باکس پلات',freq:'فراوانی',share:'سهم',trend:'روند',jointfreq:'فراوانی مشترک'}:{vs:'vs',hist:'Histogram of',box:'Box plot of',freq:'Frequency of',share:'Share of',trend:'Trend of',jointfreq:'Joint frequency of'};
+ if(type==='scatter'){
+  let a=data.filter(r=>num(r[x])&&num(r[y]));
+  Plotly.newPlot('plot',[{x:a.map(r=>+r[x]),y:a.map(r=>+r[y]),mode:'markers',type:'scatter'}],{title:`${x} ${T.vs} ${y}`,xaxis:{title:x},yaxis:{title:y}});
+ }
+ else if(type==='histogram'){
+  Plotly.newPlot('plot',[{x:vals(x),type:'histogram'}],{title:`${T.hist} ${x}`});
+ }
+ else if(type==='box'){
+  Plotly.newPlot('plot',[{y:vals(x),type:'box',name:x}],{title:`${T.box} ${x}`});
+ }
+ else if(type==='bar'){
+  let counts={};data.forEach(r=>{if(r[x]!==''&&r[x]!=null)counts[r[x]]=(counts[r[x]]||0)+1});
+  Plotly.newPlot('plot',[{x:Object.keys(counts),y:Object.values(counts),type:'bar'}],{title:`${T.freq} ${x}`});
+ }
+ else if(type==='pie'){
+  let counts={};data.forEach(r=>{if(r[x]!==''&&r[x]!=null)counts[r[x]]=(counts[r[x]]||0)+1});
+  let entries=Object.entries(counts).sort((a,b)=>b[1]-a[1]);
+  if(entries.length>9){let head=entries.slice(0,8),rest=entries.slice(8).reduce((s,e)=>s+e[1],0);entries=[...head,[lang==='fa'?'سایر':'Other',rest]];}
+  Plotly.newPlot('plot',[{labels:entries.map(e=>e[0]),values:entries.map(e=>e[1]),type:'pie'}],{title:`${T.share} ${x}`});
+ }
+ else if(type==='line'||type==='area'){
+  let rows=data.filter(r=>num(r[x])&&num(r[y])).map(r=>({x:+r[x],y:+r[y]})).sort((a,b)=>a.x-b.x);
+  let trace={x:rows.map(r=>r.x),y:rows.map(r=>r.y),mode:'lines+markers',type:'scatter'};
+  if(type==='area') trace.fill='tozeroy';
+  Plotly.newPlot('plot',[trace],{title:`${T.trend} ${y} (${T.vs} ${x})`,xaxis:{title:x},yaxis:{title:y}});
+ }
+ else if(type==='timeseries'){
+  let rows=data.map(r=>({d:new Date(r[x]),y:Number(r[y])})).filter(r=>!isNaN(r.d.getTime())&&Number.isFinite(r.y)).sort((a,b)=>a.d-b.d);
+  if(rows.length<2){$('plot').innerHTML=`<div class="note">${lang==='fa'?'داده معتبر کافی برای سری زمانی وجود ندارد؛ متغیر اول باید به‌صورت تاریخ قابل‌شناسایی باشد (مثلاً 2024-01-15).':'Not enough valid data for a time series; Variable 1 must be a recognizable date (e.g. 2024-01-15).'}</div>`;return}
+  Plotly.newPlot('plot',[{x:rows.map(r=>r.d),y:rows.map(r=>r.y),mode:'lines+markers',type:'scatter'}],{title:`${T.trend} ${y}`,xaxis:{title:lang==='fa'?'زمان':'Time'},yaxis:{title:y}});
+ }
+ else if(type==='groupedbar'){
+  let rowsL=[...new Set(data.map(r=>r[x]).filter(v=>v!==''&&v!=null).map(String))];
+  let colsL=[...new Set(data.map(r=>r[y]).filter(v=>v!==''&&v!=null).map(String))];
+  let valid=data.filter(r=>r[x]!==''&&r[x]!=null&&r[y]!==''&&r[y]!=null);
+  let traces=colsL.map(cl=>({x:rowsL,y:rowsL.map(rl=>valid.filter(r=>String(r[x])===rl&&String(r[y])===cl).length),name:cl,type:'bar'}));
+  Plotly.newPlot('plot',traces,{title:`${T.jointfreq} ${x} ${lang==='fa'?'و':'and'} ${y}`,barmode:'group'});
+ }
+}
 const ADVICE_TEXT={
  fa:{compare_numeric_2:'آزمون پیشنهادی: t مستقل. پیش‌فرض نرمال بودن و همگنی واریانس را بررسی کنید.',compare_numeric_3:'آزمون پیشنهادی: ANOVA. در صورت معناداری، آزمون‌های تعقیبی انجام دهید.',compare_categorical:'آزمون پیشنهادی: Chi-square.',relation_numeric:'پیشنهاد: Pearson. در صورت نقض فرض‌های مناسب، Spearman را بررسی کنید.',relation_categorical:'پیشنهاد: Chi-square یا مدل‌های طبقه‌ای.',predict_numeric:'پیشنهاد: رگرسیون خطی، Random Forest و XGBoost با Cross Validation.',predict_categorical:'پیشنهاد: Logistic Regression، Random Forest و XGBoost.',adviceFooter:'شما می‌توانید روش را تغییر دهید. برنامه باید پیشنهاددهنده باشد، نه تصمیم‌گیرنده نهایی.'},
  en:{compare_numeric_2:'Suggested test: Independent-samples t-test. Check the assumptions of normality and homogeneity of variance.',compare_numeric_3:'Suggested test: ANOVA. If significant, run post-hoc tests.',compare_categorical:'Suggested test: Chi-square.',relation_numeric:'Suggestion: Pearson correlation. If assumptions are violated, consider Spearman.',relation_categorical:'Suggestion: Chi-square or categorical models.',predict_numeric:'Suggestion: Linear Regression, Random Forest, and XGBoost with Cross-Validation.',predict_categorical:'Suggestion: Logistic Regression, Random Forest, and XGBoost.',adviceFooter:'You can change the method. This tool should advise, not make the final decision.'}
